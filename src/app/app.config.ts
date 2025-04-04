@@ -9,5 +9,11 @@ import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { getStorage, provideStorage } from '@angular/fire/storage';
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes), provideClientHydration(withEventReplay()), provideFirebaseApp(() => initializeApp({ projectId: environment.projectId, appId: environment.appId, storageBucket: environment.storageBucket, apiKey: environment.apiKey, authDomain: environment.authDomain, messagingSenderId: environment.messagingSenderId })), provideAuth(() => getAuth()), provideFirestore(() => getFirestore()), provideStorage(() => getStorage())]
+  providers: [provideZoneChangeDetection({ eventCoalescing: true }), 
+    provideRouter(routes), 
+    provideClientHydration(withEventReplay()), 
+    provideFirebaseApp(() => initializeApp({ projectId: environment.projectId, appId: environment.appId, storageBucket: environment.storageBucket, apiKey: environment.apiKey, authDomain: environment.authDomain, messagingSenderId: environment.messagingSenderId })), 
+    provideAuth(() => getAuth()), 
+    provideFirestore(() => getFirestore()), 
+    provideStorage(() => getStorage())]
 };
