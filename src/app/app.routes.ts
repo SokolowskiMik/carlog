@@ -11,22 +11,29 @@ import { FuelFormComponent } from './components/fuel/fuel-form/fuel-form.compone
 import { NotesComponent } from './components/notes/notes.component';
 import { NotesDetailsComponent } from './components/notes/notes-details/notes-details.component';
 import { NotesFormComponent } from './components/notes/notes-form/notes-form.component';
+import { RegisterComponent } from './components/register/register.component';
+import { LoginComponent } from './components/login/login.component';
+import { authGuard } from './data/auth.guard';
 
 export const routes: Routes = [
     {path:'',component:TestComponent},
-    {path:'garage', component: GarageComponent},
-    {path:'garage-form', component: GarageFormComponent},
-    { path: 'garage-form/:carId', component: GarageFormComponent },
-    {path:'current-car/:carId', component: CurrentCarComponent},
-    {path:'insurance/:insuranceId/:carId', component: InsuranceComponent},
-    {path:'insurance-form/:carId', component: InsuranceFormComponent},
-    {path:'insurance-form/:insuranceId/:carId', component: InsuranceFormComponent},
-    {path:'fuel/:carId', component: FuelComponent},
-    {path:'fuel-details/:fuelId', component: FuelDetailsComponent},
-    {path:'fuel-form', component: FuelFormComponent},
-    {path:'fuel-form/:fuelId', component: FuelFormComponent},
-    {path:'notes', component: NotesComponent},
-    {path:'notes-details/:noteId', component: NotesDetailsComponent},
-    {path:'notes-form', component: NotesFormComponent},
-    {path:'notes-form/:noteId', component: NotesFormComponent}
+    {path: 'garage', component: GarageComponent, canActivate: [authGuard] },
+    {path: 'garage-form', component: GarageFormComponent, canActivate: [authGuard] },
+    {path: 'garage-form/:carId', component: GarageFormComponent, canActivate: [authGuard] },
+    {path: 'current-car/:carId', component: CurrentCarComponent, canActivate: [authGuard] },
+    {path: 'insurance/:insuranceId/:carId', component: InsuranceComponent, canActivate: [authGuard] },
+    {path: 'insurance-form/:carId', component: InsuranceFormComponent, canActivate: [authGuard] },
+    {path: 'insurance-form/:insuranceId/:carId', component: InsuranceFormComponent, canActivate: [authGuard] },
+    {path: 'fuel/:carId', component: FuelComponent, canActivate: [authGuard] },
+    {path: 'fuel-details/:fuelId', component: FuelDetailsComponent, canActivate: [authGuard] },
+    {path: 'fuel-form', component: FuelFormComponent, canActivate: [authGuard] },
+    {path: 'fuel-form/:fuelId', component: FuelFormComponent, canActivate: [authGuard] },
+    {path: 'notes', component: NotesComponent, canActivate: [authGuard] },
+    {path: 'notes-details/:noteId', component: NotesDetailsComponent, canActivate: [authGuard] },
+    {path: 'notes-form', component: NotesFormComponent, canActivate: [authGuard] },
+    {path: 'notes-form/:noteId', component: NotesFormComponent, canActivate: [authGuard] },
+
+    {path: 'register', component: RegisterComponent},
+    {path: 'login', component: LoginComponent},
+    // {path: 'twitter-login', component: LoginTwitterComponent}
 ];
