@@ -21,38 +21,62 @@ import { UserCredential } from '@firebase/auth';
 })
 export class LoginComponent {
   loginForm!: FormGroup;
+  authError: string = '';
+  isSubmittingStandardAuth: boolean = false;
+  isSubmittingTwitterAuth: boolean = false;
 
   constructor(public authService : AuthService, private fb: FormBuilder, private router: Router) {}
 
   ngOnInit() {
     this.loginForm = this.fb.group({
-      email: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
     });
   }
 
   onSubmit() {
     if (this.loginForm.valid) {
-      this.authService.loginWithEmailPassword(this.loginForm.value.email, this.loginForm.value.password).then(success => {
-        this.handleLoginResults(success);
-      });
-    } else {
-      alert('Login failed! Please try again.!!!!!!!!');
+      this.isSubmittingStandardAuth = true;
+      this.authError = '';
+      
+      this.authService.loginWithEmailPassword(this.loginForm.value.email, this.loginForm.value.password)
+        .then(success => {
+          this.handleLoginResults(success);
+        })
+        .catch(error => {
+          if (error.code == 'auth/invalid-credential') {
+            this.authError = "Provided email or password is incorrect"
+          } else{
+            this.authError = 'Login failed. Please try again.';
+          }
+        })
+        .finally(() => {
+          this.isSubmittingStandardAuth = false;
+        });
     }
   }
 
   loginWithTwitter() {
-    this.authService.loginWithTwitter().then(success => {
-      this.handleLoginResults(success);
-    });
+    this.isSubmittingTwitterAuth = true;
+    this.authError = '';
+    
+    this.authService.loginWithTwitter()
+      .then(success => {
+        this.handleLoginResults(success);
+      })
+      .catch(error => {
+        this.authError = 'Twitter login failed. Please try again.';
+      })
+      .finally(() => {
+        this.isSubmittingTwitterAuth = false;
+      });
   }
 
   private handleLoginResults(success: UserCredential | undefined) {
     if (success) {
       this.router.navigate(['/garage']);
     } else {
-      alert('Login failed! Please try again.');
+      this.authError = 'Login failed. Please try again.';
     }
   }
 }
-
