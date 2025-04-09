@@ -93,7 +93,6 @@ export class FuelFormComponent implements OnInit {
   fuelForm!: FormGroup;
   fuelId: string | null = null;
   carId: string = '';
-  isLoading = false;
 
   constructor(
     private fb: FormBuilder,
@@ -104,27 +103,8 @@ export class FuelFormComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // First try to get carId from route params
     this.carId = this.route.snapshot.paramMap.get('carId') || '';
     this.fuelId = this.route.snapshot.paramMap.get('fuelId');
-    
-    // If not in params, try to extract from URL
-    if (!this.carId) {
-      const currentUrl = window.location.pathname;
-      console.log('Current URL:', currentUrl);
-      
-      if (currentUrl.includes('fuel-form/')) {
-        // Get the part after "fuel-form/"
-        this.carId = currentUrl.split('fuel-form/')[1];
-        console.log('Extracted carId from URL:', this.carId);
-      }
-    }
-
-    // Make sure fuelId is not the same as carId (which would happen in "create new" mode)
-    if (this.fuelId === this.carId) {
-      this.fuelId = null;
-      console.log('Reset fuelId because it matched carId');
-    }
 
     this.fuelForm = this.fb.group({
       name: ['', Validators.required],
@@ -136,7 +116,6 @@ export class FuelFormComponent implements OnInit {
       totalCost: [{ value: '', disabled: true }] 
     });
 
-    // Calculate total cost when form values change
     this.fuelForm.valueChanges.subscribe(() => {
       this.calculateTotalCost();
     });
@@ -148,29 +127,18 @@ export class FuelFormComponent implements OnInit {
 
   loadFuelData(): void {
     if (!this.fuelId || !this.carId) return;
-
-    this.isLoading = true;
+    
     this.fuelService.getFuel(this.carId, this.fuelId).subscribe({
       next: (fuel) => {
         if (fuel) {
-          this.fuelForm.patchValue({
-            name: fuel.name,
-            startingPoint: fuel.startingPoint,
-            destination: fuel.destination,
-            distance: fuel.distance,
-            fuelConsumption: fuel.fuelConsumption,
-            petrolPrice: fuel.petrolPrice,
-            totalCost: fuel.totalCost.toFixed(2)
-          });
+          this.fuelForm.patchValue(fuel);
         } else {
-          this.snackBar.open('Fuel record not found, creating a new one', 'Close', { duration: 3000 });
+          this.snackBar.open('Fuel record not found', 'Close', { duration: 3000 });
         }
-        this.isLoading = false;
       },
       error: (err) => {
         console.error('Error loading fuel record:', err);
         this.snackBar.open('Error loading fuel record details', 'Close', { duration: 3000 });
-        this.isLoading = false;
       }
     });
   }
@@ -199,38 +167,24 @@ export class FuelFormComponent implements OnInit {
     }
 
     try {
-      this.isLoading = true;
       const formValues = this.fuelForm.getRawValue();
       
-      // Ensure proper numeric values
       const fuelData: Fuel = {
-        name: formValues.name,
-        startingPoint: formValues.startingPoint,
-        destination: formValues.destination,
-        distance: parseFloat(formValues.distance),
-        fuelConsumption: parseFloat(formValues.fuelConsumption),
-        petrolPrice: parseFloat(formValues.petrolPrice),
-        totalCost: parseFloat(formValues.totalCost)
+        ...formValues
       };
       
       if (this.fuelId) {
-        // Update existing record
         await this.fuelService.updateFuel(this.carId, this.fuelId, fuelData);
         this.snackBar.open('Fuel record updated successfully', 'Close', { duration: 3000 });
       } else {
-        // Add new record
         await this.fuelService.addFuel(this.carId, fuelData);
         this.snackBar.open('Fuel record added successfully', 'Close', { duration: 3000 });
-      }
-      
-      // Navigate back to fuel list
+      }      
       this.router.navigate(['/car', this.carId, 'fuel']);
       
     } catch (error) {
       console.error('Error saving fuel record:', error);
       this.snackBar.open('Error saving fuel record', 'Close', { duration: 3000 });
-    } finally {
-      this.isLoading = false;
-    }
+    } 
   }
 }

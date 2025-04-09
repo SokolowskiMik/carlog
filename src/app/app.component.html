@@ -3,5 +3,5 @@
   <div class="flex-grow-1 overflow-auto mb-3">
     <router-outlet></router-outlet>
   </div>
-  <app-navbar class=""></app-navbar>
+  <app-navbar *ngIf="showNavbar()"></app-navbar>
 </div>

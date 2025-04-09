@@ -21,7 +21,6 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 export class GarageFormComponent {
   carId: string | null = null;
   carForm!: FormGroup;
-  isLoading = false;
   selectedFile: File | null = null;
   constructor(
     private route: ActivatedRoute,
@@ -32,7 +31,6 @@ export class GarageFormComponent {
   ) {}
 
   ngOnInit() {
-    // this.carId = this.route.snapshot.paramMap.get('carId') ? +this.route.snapshot.paramMap.get('carId')! : null;
     this.carId = this.route.snapshot.paramMap.get('carId');
     this.carForm = this.fb.group({
       name: ['', Validators.required],
@@ -45,7 +43,6 @@ export class GarageFormComponent {
       engineCapacity: ['', [Validators.required, Validators.min(0.1)]],
       image: [null], 
       technicalInspectionDate: ['', Validators.required],
-      insuranceEndDate: ['', Validators.required],
       registrationCertificateNumber: ['', Validators.required]
     });
     console.log(this.carId);
@@ -57,39 +54,13 @@ export class GarageFormComponent {
   loadCarData() {
     if (!this.carId) return;
     
-    this.isLoading = true;
     this.carService.getCarById(this.carId)
-      .pipe(finalize(() => this.isLoading = false))
       .subscribe({
         next: (car) => {
           if (car) {
-            // Handle date conversion for technicalInspectionDate
             if (car.technicalInspectionDate) {
-              // If stored as Firestore Timestamp, convert to Date
-              if (car.technicalInspectionDate.toDate) {
-                car.technicalInspectionDate = car.technicalInspectionDate.toDate();
-              } 
-              // If stored as string, convert to Date
-              else if (typeof car.technicalInspectionDate === 'string') {
-                car.technicalInspectionDate = new Date(car.technicalInspectionDate);
-              }
-              
-              car.technicalInspectionDate = formatDateOnly(car.technicalInspectionDate);
+              car.technicalInspectionDate = new Date(car.technicalInspectionDate);
             }
-
-            if (car.insuranceEndDate) {
-              // If stored as Firestore Timestamp, convert to Date
-              if (car.insuranceEndDate.toDate) {
-                car.insuranceEndDate = car.insuranceEndDate.toDate();
-              } 
-              // If stored as string, convert to Date
-              else if (typeof car.insuranceEndDate === 'string') {
-                car.insuranceEndDate = new Date(car.insuranceEndDate);
-              }
-
-              car.insuranceEndDate = formatDateOnly(car.insuranceEndDate);
-            }
-            
             this.carForm.patchValue(car);
           } else {
             this.snackBar.open('Car not found!', 'Close', { duration: 3000 });
@@ -116,24 +87,13 @@ export class GarageFormComponent {
     }
     
     try {
-      this.isLoading = true;
       const carData = this.carForm.value;
-      
-      // Convert date to string for Firestore
-      if (carData.technicalInspectionDate instanceof Date) {
-        carData.technicalInspectionDate = formatDateOnly(carData.technicalInspectionDate);
-      }
-
-      if (carData.insuranceEndDate instanceof Date) {
-        carData.insuranceEndDate = formatDateOnly(carData.insuranceEndDate);
-      }
+      carData.technicalInspectionDate = formatDateOnly(carData.technicalInspectionDate);
       
       if (this.carId) {
-        // Update existing car
         await this.carService.updateCar(this.carId, carData, this.selectedFile || undefined);
         this.snackBar.open('Car updated successfully!', 'Close', { duration: 3000 });
       } else {
-        // Add new car
         await this.carService.addCar(carData, this.selectedFile || undefined);
         this.snackBar.open('Car added successfully!', 'Close', { duration: 3000 });
       }
@@ -142,12 +102,12 @@ export class GarageFormComponent {
     } catch (error) {
       console.error('Error saving car:', error);
       this.snackBar.open('Error saving car data', 'Close', { duration: 3000 });
-    } finally {
-      this.isLoading = false;
     }
   }
   
 }
 function formatDateOnly(date: Date): string {
-  return date.toISOString().split('T')[0]; // gets YYYY-MM-DD
+  const nextDay = new Date(date);
+  nextDay.setDate(nextDay.getDate() + 1);
+  return nextDay.toISOString().split('T')[0];
 }

@@ -97,7 +97,6 @@ export class NotesFormComponent implements OnInit {
   carId: string = '';
   selectedImageFiles: File[] = [];
   selectedAudioFile: File | null = null;
-  isLoading = false;
   isRecording = false;
   mediaRecorder: MediaRecorder | null = null;
   audioChunks: Blob[] = [];
@@ -151,7 +150,6 @@ export class NotesFormComponent implements OnInit {
   loadNoteData(): void {
     if (!this.noteId || !this.carId) return;
   
-    this.isLoading = true;
     this.notesService.getNote(this.carId, this.noteId).subscribe({
       next: (note) => {
         // Check if note exists before accessing its properties
@@ -175,12 +173,10 @@ export class NotesFormComponent implements OnInit {
           this.snackBar.open('Note not found, creating a new one', 'Close', { duration: 3000 });
         }
   
-        this.isLoading = false;
       },
       error: (err) => {
         console.error('Error loading note:', err);
         this.snackBar.open('Error loading note details', 'Close', { duration: 3000 });
-        this.isLoading = false;
       }
     });
   }
@@ -296,7 +292,6 @@ export class NotesFormComponent implements OnInit {
     }
 
     try {
-      this.isLoading = true;
       const noteData = this.noteForm.value;
       
       // Upload images if any
@@ -344,8 +339,6 @@ export class NotesFormComponent implements OnInit {
     } catch (error) {
       console.error('Error saving note:', error);
       this.snackBar.open('Error saving note', 'Close', { duration: 3000 });
-    } finally {
-      this.isLoading = false;
-    }
+    } 
   }
 }

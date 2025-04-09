@@ -79,11 +79,9 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
   styleUrl: './fuel.component.scss'
 })
 export class FuelComponent implements OnInit {
-  displayedColumns: string[] = ['name', 'details', 'actions'];
+  displayedColumns: string[] = ['name', 'actions'];
   dataSource: Fuel[] = [];
   carId: string = '';
-  isLoading = false;
-  error = false;
 
   constructor(
     private router: Router,
@@ -93,43 +91,22 @@ export class FuelComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // First try to get carId from route params
     this.carId = this.route.snapshot.paramMap.get('carId') || '';
     
-    // If not in params, try to extract from URL
-    if (!this.carId) {
-      const currentUrl = window.location.pathname;
-      if (currentUrl.includes('/car/') && currentUrl.includes('/fuel')) {
-        const segments = currentUrl.split('/');
-        const carIndex = segments.indexOf('car');
-        if (carIndex !== -1 && segments.length > carIndex + 1) {
-          this.carId = segments[carIndex + 1];
-        }
-      } else {
-        // For direct fuel page access
-        this.carId = currentUrl.split('/')[2] || '';
-      }
-    }
-
     if (this.carId) {
       this.loadFuels();
     } else {
-      this.error = true;
       this.snackBar.open('Car ID not found', 'Close', { duration: 3000 });
     }
   }
 
   loadFuels(): void {
-    this.isLoading = true;
     this.fuelService.getFuels(this.carId).subscribe({
       next: (fuels) => {
         this.dataSource = fuels;
-        this.isLoading = false;
       },
       error: (err) => {
         console.error('Error loading fuel records:', err);
-        this.error = true;
-        this.isLoading = false;
         this.snackBar.open('Error loading fuel records', 'Close', { duration: 3000 });
       }
     });
@@ -139,27 +116,16 @@ export class FuelComponent implements OnInit {
     this.router.navigate(['/car', this.carId, 'fuel-details', fuel.id]);
   }
 
-  editFuel(fuel: Fuel, event: Event): void {
-    event.stopPropagation();
-    this.router.navigate(['/car', this.carId, 'fuel-form', fuel.id]);
-  }
-
-  deleteFuel(fuel: Fuel, event: Event): void {
-    event.stopPropagation();
-    if (confirm('Are you sure you want to delete this fuel record?')) {
-      this.isLoading = true;
-      this.fuelService.deleteFuel(this.carId, fuel.id!)
-        .then(() => {
-          this.snackBar.open('Fuel record deleted successfully', 'Close', { duration: 3000 });
-          // Reload fuel list
-          this.loadFuels();
-        })
-        .catch((error) => {
-          console.error('Error deleting fuel record:', error);
-          this.snackBar.open('Error deleting fuel record', 'Close', { duration: 3000 });
-          this.isLoading = false;
-        });
-    }
+  deleteFuel(fuel: Fuel): void {
+    this.fuelService.deleteFuel(this.carId, fuel.id!)
+      .then(() => {
+        this.snackBar.open('Fuel record deleted successfully', 'Close', { duration: 3000 });
+        this.loadFuels();
+      })
+      .catch((error) => {
+        console.error('Error deleting fuel record:', error);
+        this.snackBar.open('Error deleting fuel record', 'Close', { duration: 3000 });
+      });
   }
 
   addFuel(): void {

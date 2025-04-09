@@ -44,7 +44,6 @@ import { Car } from '../../data/car';
 export class CurrentCarComponent implements OnInit {
   carId!: string;
   car: any;
-  isLoading = true;
 
   constructor(
     private route: ActivatedRoute,
@@ -64,7 +63,6 @@ export class CurrentCarComponent implements OnInit {
     this.carService.getCarById(this.carId).subscribe({
       next: (car) => {
         this.car = car;
-        this.isLoading = false;
       },
       error: (err) => {
         console.error('Error loading car:', err);
@@ -73,6 +71,19 @@ export class CurrentCarComponent implements OnInit {
       }
     });
   }
+
+  deleteCar() {
+
+    this.carService.deleteCar(this.carId)
+      .then(() => {
+        this.snackBar.open('Car deleted successfully', 'Close', { duration: 3000 });
+        this.router.navigate(['/garage']);
+      })
+      .catch(err => {
+        console.error('Error deleting car:', err);
+        this.snackBar.open('Error deleting car', 'Close', { duration: 3000 });
+      });
+}
 
   
 }

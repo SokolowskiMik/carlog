@@ -11,7 +11,7 @@
         </button> -->
 
         <div class="d-flex flex-column align-items-center justify-content-center ms-auto">
-            <button mat-button class="d-flex flex-column align-items-center btn btn-sm p-1" (click)="logOut()">
+            <button mat-button class="d-flex flex-column align-items-center btn btn-sm p-1" (click)="logOut()" *ngIf="showLogout()">
                 <i class="material-icons fs-6">logout</i>
                 <span class="fs-6">Log Out</span>
             </button>
