@@ -20,28 +20,39 @@ import { Router, RouterLink } from '@angular/router';
 })
 export class RegisterComponent {
   registerForm!: FormGroup;
-
+  authError: string = '';
+  isSubmitting: boolean = false;
 
   constructor(public authService : AuthService, private fb: FormBuilder, private router: Router) {}
 
   ngOnInit() {
     this.registerForm = this.fb.group({
-      email: ['', Validators.required],
-      password: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
     });
   }
 
   onSubmit() {
     if (this.registerForm.valid) {
-      this.authService.register(this.registerForm.value.email, this.registerForm.value.password).then(success => {
-        if (success) {
-          this.router.navigate(['/garage']);
-        } else {
-          alert('Login failed! Please try again.');
-        }
-      });
-    } else {
-      alert('Login failed! Please try again.');
+      this.isSubmitting = true;
+      this.authError = '';
+      
+      this.authService.register(this.registerForm.value.email, this.registerForm.value.password)
+        .then(success => {
+          if (success) {
+            this.router.navigate(['/garage']);
+          }
+        })
+        .catch(error => {
+          if (error.code == 'auth/email-already-in-use') {
+            this.authError = "Email already in use"
+          } else{
+            this.authError = 'Registration failed. Please try again.';
+          }
+        })
+        .finally(() => {
+          this.isSubmitting = false;
+        });
     }
   }
 }

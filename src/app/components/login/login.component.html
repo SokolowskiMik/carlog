@@ -1,26 +1,31 @@
 <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="d-flex flex-column container-fluid container-md">
-    <mat-form-field  class="mb-3">
-      <mat-label>Email</mat-label>
-      <input matInput type="text" formControlName="email" placeholder="email">
-      <mat-error *ngIf="loginForm.get('name')?.hasError('required')">Email is required</mat-error>
-    </mat-form-field>
-  
-    <mat-form-field  class="mb-3">
-      <mat-label>Password</mat-label>
-      <input matInput type="password" formControlName="password" placeholder="password">
-      <mat-error *ngIf="loginForm.get('model')?.hasError('required')">Password is required</mat-error>
-    </mat-form-field>
-      
-    <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid">
-      Submit
-    </button>
-  </form>
-
-  <div class="d-flex flex-column container-fluid container-md">
-    <button mat-raised-button color="primary" (click)="loginWithTwitter()">
-      Login using Twitter
-    </button>
-    <p>Dont have an account?</p>
-    <a [routerLink]="['/register']">Click here to register</a>
+  <div *ngIf="authError" class="error-message mb-3 alert alert-danger">
+    {{ authError }}
   </div>
-  
+
+  <mat-form-field class="mb-3">
+    <mat-label>Email</mat-label>
+    <input matInput type="email" formControlName="email" placeholder="email">
+    <mat-error *ngIf="loginForm.get('email')?.hasError('required')">Email is required</mat-error>
+    <mat-error *ngIf="loginForm.get('email')?.hasError('email')">Please enter a valid email</mat-error>
+  </mat-form-field>
+
+  <mat-form-field class="mb-3">
+    <mat-label>Password</mat-label>
+    <input matInput type="password" formControlName="password" placeholder="password">
+    <mat-error *ngIf="loginForm.get('password')?.hasError('required')">Password is required</mat-error>
+  </mat-form-field>
+    
+  <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid || isSubmittingStandardAuth">
+    {{ isSubmittingStandardAuth ? 'Logging in...' : 'Login' }}
+  </button>
+</form>
+
+<div class="d-flex flex-column container-fluid container-md">
+  <button mat-raised-button color="primary" (click)="loginWithTwitter()" [disabled]="isSubmittingTwitterAuth">
+    {{ isSubmittingTwitterAuth ? 'Processing...' : 'Login using Twitter' }}
+  </button>
+  <p>Don't have an account?</p>
+  <a [routerLink]="['/register']">Click here to register</a>
+</div>
+
