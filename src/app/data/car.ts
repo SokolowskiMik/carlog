@@ -9,5 +9,6 @@ export interface Car {
     engineCapacity: number;
     image: string | null;
     technicalInspectionDate: string;
+    insuranceEndDate: string;
     registrationCertificateNumber: string;
 }
