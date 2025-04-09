@@ -73,8 +73,6 @@ export class NotesComponent implements OnInit {
   displayedColumns: string[] = ['title', 'actions'];
   dataSource: Note[] = [];
   carId: string = '';
-  isLoading = false;
-  error = false;
 
   constructor(
     private router: Router,
@@ -84,37 +82,22 @@ export class NotesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Get carId from route
     this.carId = this.route.snapshot.paramMap.get('carId') || '';
-    if (!this.carId) {
-      // Extract from URL if not in route params
-      const currentUrl = window.location.pathname;
-      const segments = currentUrl.split('/');
-      const carIndex = segments.indexOf('car');
-      if (carIndex !== -1 && segments.length > carIndex + 1) {
-        this.carId = segments[carIndex + 1];
-      }
-    }
-
+    
     if (this.carId) {
       this.loadNotes();
     } else {
-      this.error = true;
       this.snackBar.open('Car ID not found', 'Close', { duration: 3000 });
     }
   }
 
   loadNotes(): void {
-    this.isLoading = true;
     this.notesService.getNotes(this.carId).subscribe({
       next: (notes) => {
         this.dataSource = notes;
-        this.isLoading = false;
       },
       error: (err) => {
         console.error('Error loading notes:', err);
-        this.error = true;
-        this.isLoading = false;
         this.snackBar.open('Error loading notes', 'Close', { duration: 3000 });
       }
     });
@@ -123,28 +106,17 @@ export class NotesComponent implements OnInit {
   viewNoteDetails(note: Note): void {
     this.router.navigate(['/notes-details', this.carId, note.id]);
   }
-
-  editNote(note: Note, event: Event): void {
-    event.stopPropagation();
-    this.router.navigate(['/notes-form', this.carId, note.id]);
-  }
-
-  deleteNote(note: Note, event: Event): void {
-    event.stopPropagation();
-    if (confirm('Are you sure you want to delete this note?')) {
-      this.isLoading = true;
+  deleteNote(note: Note): void {
       this.notesService.deleteNote(this.carId, note.id!)
         .then(() => {
           this.snackBar.open('Note deleted successfully', 'Close', { duration: 3000 });
-          // Reload notes list
           this.loadNotes();
         })
         .catch((error) => {
           console.error('Error deleting note:', error);
           this.snackBar.open('Error deleting note', 'Close', { duration: 3000 });
-          this.isLoading = false;
         });
-    }
+    
   }
 
   addNote(): void {

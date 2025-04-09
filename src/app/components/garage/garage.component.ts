@@ -30,7 +30,6 @@ import { VibrationsService } from '../../data/vibrations.service';
 })
 export class GarageComponent implements OnInit {
   cars: any[] = [];
-  isLoading = false;
   insuranceExpiring: string[] = [];
   
   constructor(
@@ -52,15 +51,12 @@ export class GarageComponent implements OnInit {
   }
 
   loadCars() {
-    this.isLoading = true;
     this.carService.getCars().subscribe({
       next: (cars) => {
         this.cars = cars;
-        this.isLoading = false;
       },
       error: (err) => {
         console.error('Error loading cars:', err);
-        this.isLoading = false;
         this.snackBar.open('Error loading your cars', 'Close', { duration: 3000 });
       }
     });
@@ -75,7 +71,7 @@ export class GarageComponent implements OnInit {
   }
 
   deleteCar(carId: string) {
-    if (confirm('Are you sure you want to delete this car?')) {
+
       this.carService.deleteCar(carId)
         .then(() => {
           this.snackBar.open('Car deleted successfully', 'Close', { duration: 3000 });
@@ -84,6 +80,5 @@ export class GarageComponent implements OnInit {
           console.error('Error deleting car:', err);
           this.snackBar.open('Error deleting car', 'Close', { duration: 3000 });
         });
-    }
   }
 }

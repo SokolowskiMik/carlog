@@ -37,8 +37,7 @@ import { Insurance } from '../../data/insurance';
 export class InsuranceComponent implements OnInit {
   insurance: Insurance | null = null;
   carId!: string;
-  loading = true;
-  error = false;
+
 
   constructor(
     private insuranceService: InsuranceService,
@@ -48,7 +47,6 @@ export class InsuranceComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // Extract carId from URL
     const currentUrl = window.location.pathname;
     this.carId = currentUrl.split('/')[2];
     
@@ -57,41 +55,31 @@ export class InsuranceComponent implements OnInit {
   }
 
   loadInsurance() {
-    this.loading = true;
+
     this.insuranceService.getInsuranceForCar(this.carId).subscribe({
       next: (data) => {
         this.insurance = data;
-        this.loading = false;
+  
       },
       error: (error) => {
         console.error('Error loading insurance:', error);
-        this.error = true;
-        this.loading = false;
+     
       }
     });
   }
 
-  // Add this method to handle insurance deletion
+
   deleteInsurance() {
-    // You can add a confirmation dialog here if you want
-    const confirmDelete = confirm('Are you sure you want to delete this insurance?');
-    
-    if (confirmDelete) {
-      this.loading = true;
+ 
       this.insuranceService.deleteInsurance(this.carId)
         .then(() => {
           this.snackBar.open('Insurance deleted successfully', 'Close', { duration: 3000 });
           this.insurance = null;
-          // Optionally, navigate back to the car details page
-          // this.router.navigate(['/car', this.carId]);
         })
         .catch((error) => {
           console.error('Error deleting insurance:', error);
           this.snackBar.open('Error deleting insurance', 'Close', { duration: 3000 });
         })
-        .finally(() => {
-          this.loading = false;
-        });
-    }
+    
   }
 }

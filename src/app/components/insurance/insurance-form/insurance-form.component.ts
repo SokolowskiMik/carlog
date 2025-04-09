@@ -49,7 +49,6 @@ import { InsuranceService } from '../../../data/insurance.service';
 export class InsuranceFormComponent implements OnInit {
   insuranceForm!: FormGroup;
   carId!: string;
-  loading = false;
   isEditing = false;
 
   constructor(
@@ -77,38 +76,19 @@ export class InsuranceFormComponent implements OnInit {
       ]],
     });
 
-    // Check if we're editing an existing insurance
     this.loadExistingInsurance();
   }
 
   loadExistingInsurance() {
-    this.loading = true;
     this.insuranceService.getInsuranceForCar(this.carId).subscribe({
       next: (insurance) => {
         if (insurance) {
-          this.isEditing = true;
-          
-          // Format dates for the form
-          const formattedInsurance = {
-            ...insurance,
-            dateOfContractConclusion: insurance.dateOfContractConclusion instanceof Date ? 
-              insurance.dateOfContractConclusion : 
-              new Date(insurance.dateOfContractConclusion),
-              startOfInsurance: insurance.startOfInsurance instanceof Date ? 
-              insurance.startOfInsurance : 
-              new Date(insurance.startOfInsurance),
-              endOfInsurance: insurance.endOfInsurance instanceof Date ? 
-              insurance.endOfInsurance : 
-              new Date(insurance.endOfInsurance)
-          };
-          
-          this.insuranceForm.patchValue(formattedInsurance);
+          this.isEditing = true;          
+          this.insuranceForm.patchValue(insurance);
         }
-        this.loading = false;
       },
       error: (error) => {
         console.error('Error loading insurance:', error);
-        this.loading = false;
         this.snackBar.open('Error loading insurance details', 'Close', { duration: 3000 });
       }
     });
@@ -121,21 +101,18 @@ export class InsuranceFormComponent implements OnInit {
     }
     
     try {
-      this.loading = true;
       const insuranceData = this.insuranceForm.value;
       
-      // Convert dates to string for Firestore
-      if (insuranceData.dateOfContractConclusion instanceof Date) {
-        insuranceData.dateOfContractConclusion = formatDateOnly(insuranceData.dateOfContractConclusion);
-      }
+
+      insuranceData.dateOfContractConclusion = formatDateOnly(insuranceData.dateOfContractConclusion);
+
   
-      if (insuranceData.startOfInsurance instanceof Date) {
-        insuranceData.startOfInsurance = formatDateOnly(insuranceData.startOfInsurance);
-      }
-  
-      if (insuranceData.endOfInsurance instanceof Date) {
-        insuranceData.endOfInsurance = formatDateOnly(insuranceData.endOfInsurance);
-      }
+
+      insuranceData.startOfInsurance = formatDateOnly(insuranceData.startOfInsurance);
+
+
+      insuranceData.endOfInsurance = formatDateOnly(insuranceData.endOfInsurance);
+
       
       await this.insuranceService.saveInsurance(this.carId, insuranceData);
       this.snackBar.open(`Insurance ${this.isEditing ? 'updated' : 'added'} successfully!`, 'Close', { duration: 3000 });
@@ -143,12 +120,12 @@ export class InsuranceFormComponent implements OnInit {
     } catch (error) {
       console.error('Error saving insurance:', error);
       this.snackBar.open('Error saving insurance data', 'Close', { duration: 3000 });
-    } finally {
-      this.loading = false;
     }
   }
   
 }
 function formatDateOnly(date: Date): string {
-  return date.toISOString().split('T')[0]; // gets YYYY-MM-DD
+  const nextDay = new Date(date);
+  nextDay.setDate(nextDay.getDate() + 1);
+  return nextDay.toISOString().split('T')[0];
 }

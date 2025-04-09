@@ -16,7 +16,6 @@ import { LoginComponent } from './components/login/login.component';
 import { authGuard } from './data/auth.guard';
 
 export const routes: Routes = [
-    {path:'',component:TestComponent},
     {path: 'garage', component: GarageComponent, canActivate: [authGuard] },
     {path: 'garage-form', component: GarageFormComponent, canActivate: [authGuard] },
     {path: 'garage-form/:carId', component: GarageFormComponent, canActivate: [authGuard] },
@@ -42,4 +41,5 @@ export const routes: Routes = [
 
     {path: 'register', component: RegisterComponent},
     {path: 'login', component: LoginComponent},
+    {path: '**', component: GarageComponent, canActivate: [authGuard] },
 ];

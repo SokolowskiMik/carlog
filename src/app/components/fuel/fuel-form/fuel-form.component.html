@@ -56,12 +56,9 @@
     <form [formGroup]="fuelForm" (ngSubmit)="onSubmit()">
       <h2 class="text-center">{{fuelId ? 'Edit' : 'Add'}} Fuel Record</h2>
   
-      <!-- Loading spinner -->
-      <div *ngIf="isLoading" class="d-flex justify-content-center my-4">
-        <mat-spinner></mat-spinner>
-      </div>
+
   
-      <div *ngIf="!isLoading">
+      <div>
         <!-- Trip Name -->
         <mat-form-field class="w-100 mb-3">
           <mat-label>Trip Name</mat-label>
@@ -133,11 +130,11 @@
         </mat-form-field>
   
         <!-- Form actions -->
-        <div class="d-flex gap-2 mb-3">
-          <button type="submit" mat-raised-button color="primary" [disabled]="fuelForm.invalid || isLoading" class="flex-grow-1">
+        <div class="d-flex justify-content-around">
+          <button type="submit" mat-raised-button color="primary" [disabled]="fuelForm.invalid " >
             {{fuelId ? 'Update' : 'Save'}} Fuel Record
           </button>
-          <button type="button" mat-button [routerLink]="['/car', carId, 'fuel']">
+          <button type="button" mat-raised-button [routerLink]="['/car', carId, 'fuel']">
             Cancel
           </button>
         </div>

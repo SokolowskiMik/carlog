@@ -16,16 +16,22 @@
     <mat-error *ngIf="loginForm.get('password')?.hasError('required')">Password is required</mat-error>
   </mat-form-field>
     
-  <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid || isSubmittingStandardAuth">
+  <button class="mb-3" mat-raised-button  type="submit" [disabled]="loginForm.invalid || isSubmittingStandardAuth">
     {{ isSubmittingStandardAuth ? 'Logging in...' : 'Login' }}
   </button>
-</form>
 
-<div class="d-flex flex-column container-fluid container-md">
-  <button mat-raised-button color="primary" (click)="loginWithTwitter()" [disabled]="isSubmittingTwitterAuth">
+  <button class="mb-3" mat-raised-button (click)="loginWithTwitter()" [disabled]="isSubmittingTwitterAuth">
     {{ isSubmittingTwitterAuth ? 'Processing...' : 'Login using Twitter' }}
   </button>
-  <p>Don't have an account?</p>
-  <a [routerLink]="['/register']">Click here to register</a>
-</div>
+  <div class="d-flex">
+    <p>Don't have an account?</p>
+    <a [routerLink]="['/register']">Click here to register</a>
+  </div>
+
+</form>
+
+
+
+
+
 
