@@ -1,4 +1,4 @@
-<mat-card class="container-fluid container-md" appearance="outlined" >
+<!-- <mat-card class="container-fluid container-md" appearance="outlined" >
     <mat-card-header class="justify-content-center" >
       <mat-card-title ><h6>{{car.name}}</h6></mat-card-title>
     </mat-card-header>
@@ -80,4 +80,102 @@
             <i class="material-icons">edit</i>Edit
           </button>
     </mat-card-actions>
-  </mat-card>
+  </mat-card> -->
+
+  <ng-container *ngIf="isLoading; else carDetails">
+    <div class="d-flex justify-content-center mt-5">
+      <mat-spinner></mat-spinner>
+    </div>
+  </ng-container>
+  
+  <ng-template #carDetails>
+    <mat-card class="container-fluid container-md" appearance="outlined">
+      <mat-card-header class="justify-content-center">
+        <mat-card-title><h6>{{ car.name }}</h6></mat-card-title>
+      </mat-card-header>
+  
+      <img mat-card-image [src]="car.image" alt="Car image" />
+  
+      <mat-card-content>
+        <div class="d-flex w-100 gap-1 mt-2 mb-2">
+          <div class="d-flex flex-column w-50 align-items-center">
+            <h6>Model</h6>
+            <p>{{ car.model }}</p>
+          </div>
+          <div class="d-flex flex-column w-50 align-items-center">
+            <h6>Mileage</h6>
+            <p>{{ car.mileage }}</p>
+          </div>
+        </div>
+  
+        <mat-divider></mat-divider>
+  
+        <div class="d-flex w-100 mb-2">
+          <div class="d-flex flex-column w-50 align-items-center">
+            <h6>Brand</h6>
+            <p>{{ car.name }}</p>
+          </div>
+          <div class="d-flex flex-column w-50 align-items-center">
+            <h6>Registration</h6>
+            <p>{{ car.registration }}</p>
+          </div>
+        </div>
+  
+        <mat-divider></mat-divider>
+  
+        <div class="d-flex w-100 mb-2">
+          <div class="d-flex flex-column w-50 align-items-center">
+            <h6>Year</h6>
+            <p>{{ car.year }}</p>
+          </div>
+          <div class="d-flex flex-column w-50 align-items-center">
+            <h6>Horse Power</h6>
+            <p>{{ car.horsePower }}</p>
+          </div>
+        </div>
+  
+        <mat-divider></mat-divider>
+  
+        <div class="d-flex flex-column w-100 align-items-center mb-2">
+          <h6>Engine Capacity</h6>
+          <p>{{ car.engineCapacity }} L</p>
+        </div>
+  
+        <mat-divider></mat-divider>
+  
+        <div class="d-flex flex-column w-100 align-items-center mb-2">
+          <h6>VIN</h6>
+          <p>{{ car.vin }}</p>
+        </div>
+  
+        <mat-divider></mat-divider>
+  
+        <div class="d-flex flex-column w-100 align-items-center mb-2">
+          <h6>Technical Inspection Date</h6>
+          <p>{{ car.technicalInspectionDate }}</p>
+        </div>
+  
+        <mat-divider></mat-divider>
+  
+        <div class="d-flex flex-column w-100 align-items-center mb-2">
+          <h6>Insurance End Date</h6>
+          <p>{{ car.insuranceEndDate }}</p>
+        </div>
+  
+        <mat-divider></mat-divider>
+  
+        <div class="d-flex flex-column w-100 align-items-center mb-2">
+          <h6>Registration Certificate Number</h6>
+          <p>{{ car.registrationCertificateNumber }}</p>
+        </div>
+      </mat-card-content>
+  
+      <mat-card-actions class="justify-content-center">
+        <button mat-button color="primary" [routerLink]="['/garage-form', car.id]">
+          <mat-icon>edit</mat-icon>
+          Edit
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </ng-template>
+  

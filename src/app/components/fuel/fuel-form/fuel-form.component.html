@@ -1,47 +1,47 @@
-  @if(fuelId){
+  <!-- @if(fuelId){
     <h3 class="text-center">Edit trip</h3>
   }@else{
     <h3 class="text-center">Create new trip</h3>
   }
-    <form [formGroup]="fuelForm" (ngSubmit)="onSubmit()" class="d-flex flex-column container-fluid container-md">
+    <form [formGroup]="fuelForm" (ngSubmit)="onSubmit()" class="d-flex flex-column container-fluid container-md"> -->
       <!-- Trip Name -->
-      <mat-form-field class="full-width">
+      <!-- <mat-form-field class="full-width">
         <mat-label>Trip Name</mat-label>
         <input matInput formControlName="name" required />
-      </mat-form-field>
+      </mat-form-field> -->
   
       <!-- Starting Point -->
-      <mat-form-field class="full-width">
+      <!-- <mat-form-field class="full-width">
         <mat-label>Starting Point</mat-label>
         <input matInput formControlName="startingPoint" required />
-      </mat-form-field>
+      </mat-form-field> -->
   
       <!-- Destination -->
-      <mat-form-field class="full-width">
+      <!-- <mat-form-field class="full-width">
         <mat-label>Destination</mat-label>
         <input matInput formControlName="destination" required />
-      </mat-form-field>
+      </mat-form-field> -->
   
       <!-- Distance -->
-      <mat-form-field class="full-width">
+      <!-- <mat-form-field class="full-width">
         <mat-label>Distance (km)</mat-label>
         <input matInput type="number" formControlName="distance" required />
-      </mat-form-field>
+      </mat-form-field> -->
   
       <!-- Fuel Consumption -->
-      <mat-form-field class="full-width">
+      <!-- <mat-form-field class="full-width">
         <mat-label>Fuel Consumption (L/100km)</mat-label>
         <input matInput type="number" formControlName="fuelConsumption" required />
-      </mat-form-field>
+      </mat-form-field> -->
   
       <!-- Petrol Price -->
-      <mat-form-field class="full-width">
+      <!-- <mat-form-field class="full-width">
         <mat-label>Petrol Price (PLN/L)</mat-label>
         <input matInput type="number" formControlName="petrolPrice" required />
-      </mat-form-field>
+      </mat-form-field> -->
   
       <!-- Total Cost (Read-Only) -->
-      <mat-form-field class="full-width">
+      <!-- <mat-form-field class="full-width">
         <mat-label>Total Cost (PLN)</mat-label>
         <input matInput type="number" formControlName="totalCost" [disabled]="true" />
       </mat-form-field>
@@ -49,5 +49,98 @@
       <button mat-raised-button color="primary" type="submit" [disabled]="fuelForm.invalid">
         Submit
       </button>
-    </form>
+    </form> -->
   
+
+   <div class="container-fluid container-md">
+    <form [formGroup]="fuelForm" (ngSubmit)="onSubmit()">
+      <h2 class="text-center">{{fuelId ? 'Edit' : 'Add'}} Fuel Record</h2>
+  
+      <!-- Loading spinner -->
+      <div *ngIf="isLoading" class="d-flex justify-content-center my-4">
+        <mat-spinner></mat-spinner>
+      </div>
+  
+      <div *ngIf="!isLoading">
+        <!-- Trip Name -->
+        <mat-form-field class="w-100 mb-3">
+          <mat-label>Trip Name</mat-label>
+          <input matInput formControlName="name" required placeholder="e.g., Weekend Trip">
+          <mat-error *ngIf="fuelForm.get('name')?.hasError('required')">
+            Trip name is required
+          </mat-error>
+        </mat-form-field>
+  
+        <!-- Starting Point -->
+        <mat-form-field class="w-100 mb-3">
+          <mat-label>Starting Point</mat-label>
+          <input matInput formControlName="startingPoint" required placeholder="e.g., Warsaw">
+          <mat-error *ngIf="fuelForm.get('startingPoint')?.hasError('required')">
+            Starting point is required
+          </mat-error>
+        </mat-form-field>
+  
+        <!-- Destination -->
+        <mat-form-field class="w-100 mb-3">
+          <mat-label>Destination</mat-label>
+          <input matInput formControlName="destination" required placeholder="e.g., Krakow">
+          <mat-error *ngIf="fuelForm.get('destination')?.hasError('required')">
+            Destination is required
+          </mat-error>
+        </mat-form-field>
+  
+        <!-- Distance -->
+        <mat-form-field class="w-100 mb-3">
+          <mat-label>Distance (km)</mat-label>
+          <input matInput type="number" formControlName="distance" required min="1" step="1">
+          <mat-error *ngIf="fuelForm.get('distance')?.hasError('required')">
+            Distance is required
+          </mat-error>
+          <mat-error *ngIf="fuelForm.get('distance')?.hasError('min')">
+            Distance must be at least 1 kilometer
+          </mat-error>
+        </mat-form-field>
+  
+        <!-- Fuel Consumption -->
+        <mat-form-field class="w-100 mb-3">
+          <mat-label>Fuel Consumption (L/100km)</mat-label>
+          <input matInput type="number" formControlName="fuelConsumption" required min="0.1" step="0.1">
+          <mat-error *ngIf="fuelForm.get('fuelConsumption')?.hasError('required')">
+            Fuel consumption is required
+          </mat-error>
+          <mat-error *ngIf="fuelForm.get('fuelConsumption')?.hasError('min')">
+            Fuel consumption must be at least 0.1 L/100km
+          </mat-error>
+        </mat-form-field>
+  
+        <!-- Petrol Price -->
+        <mat-form-field class="w-100 mb-3">
+          <mat-label>Petrol Price (PLN/L)</mat-label>
+          <input matInput type="number" formControlName="petrolPrice" required min="0.1" step="0.01">
+          <mat-error *ngIf="fuelForm.get('petrolPrice')?.hasError('required')">
+            Petrol price is required
+          </mat-error>
+          <mat-error *ngIf="fuelForm.get('petrolPrice')?.hasError('min')">
+            Petrol price must be at least 0.1 PLN/L
+          </mat-error>
+        </mat-form-field>
+  
+        <!-- Total Cost (Read-Only) -->
+        <mat-form-field class="w-100 mb-4">
+          <mat-label>Total Cost (PLN)</mat-label>
+          <input matInput formControlName="totalCost" readonly>
+          <mat-hint>Calculated as: (Distance / 100) × Fuel Consumption × Petrol Price</mat-hint>
+        </mat-form-field>
+  
+        <!-- Form actions -->
+        <div class="d-flex gap-2 mb-3">
+          <button type="submit" mat-raised-button color="primary" [disabled]="fuelForm.invalid || isLoading" class="flex-grow-1">
+            {{fuelId ? 'Update' : 'Save'}} Fuel Record
+          </button>
+          <button type="button" mat-button [routerLink]="['/car', carId, 'fuel']">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>

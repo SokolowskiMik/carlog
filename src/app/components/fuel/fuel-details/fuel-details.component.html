@@ -1,4 +1,4 @@
-<div class="d-flex flex-column gap-1 container-fluid container-md">
+<!-- <div class="d-flex flex-column gap-1 container-fluid container-md">
     <h2 class="text-center">{{fuelDetails.name}}</h2>
 
 Starting Point
@@ -45,4 +45,89 @@ Starting Point
 
 </div>
 
+ -->
 
+
+ <div class="container-fluid container-md">
+  <!-- Loading spinner -->
+  <div *ngIf="isLoading" class="d-flex justify-content-center my-4">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <!-- Error message -->
+  <div *ngIf="error" class="alert alert-danger text-center my-4">
+    An error occurred while loading fuel details.
+  </div>
+
+  <!-- Fuel details content -->
+  <div *ngIf="!isLoading && !error && fuelDetails">
+    <h2 class="text-center mb-4">{{fuelDetails.name}}</h2>
+    
+    <div class="mb-4">
+      <div class="fw-bold mb-1">Starting Point</div>
+      <mat-card appearance="outlined" class="mb-3">
+        <mat-card-content>
+          <div>{{fuelDetails.startingPoint}}</div>
+        </mat-card-content>
+      </mat-card>
+      
+      <div class="fw-bold mb-1">Destination</div>
+      <mat-card appearance="outlined" class="mb-3">
+        <mat-card-content>
+          <div>{{fuelDetails.destination}}</div>
+        </mat-card-content>
+      </mat-card>
+      
+      <div class="fw-bold mb-1">Distance</div>
+      <mat-card appearance="outlined" class="mb-3">
+        <mat-card-content>
+          <div>{{fuelDetails.distance}} km</div>
+        </mat-card-content>
+      </mat-card>
+      
+      <div class="fw-bold mb-1">Fuel Consumption</div>
+      <mat-card appearance="outlined" class="mb-3">
+        <mat-card-content>
+          <div>{{fuelDetails.fuelConsumption}} L/100km</div>
+        </mat-card-content>
+      </mat-card>
+      
+      <div class="fw-bold mb-1">Petrol Price</div>
+      <mat-card appearance="outlined" class="mb-3">
+        <mat-card-content>
+          <div>{{fuelDetails.petrolPrice}} PLN/L</div>
+        </mat-card-content>
+      </mat-card>
+      
+      <div class="fw-bold mb-1">Total Cost</div>
+      <mat-card appearance="outlined" class="mb-3">
+        <mat-card-content>
+          <div>{{fuelDetails.totalCost.toFixed(2)}} PLN</div>
+        </mat-card-content>
+      </mat-card>
+      
+      <div *ngIf="fuelDetails.createdAt" class="text-muted small mb-2">
+        Created: {{fuelDetails.createdAt.toDate ? fuelDetails.createdAt.toDate() : fuelDetails.createdAt | date:'medium'}}
+      </div>
+      
+      <div *ngIf="fuelDetails.updatedAt && fuelDetails.updatedAt !== fuelDetails.createdAt" class="text-muted small mb-3">
+        Last updated: {{fuelDetails.updatedAt.toDate ? fuelDetails.updatedAt.toDate() : fuelDetails.updatedAt | date:'medium'}}
+      </div>
+    </div>
+    
+    <div class="d-flex justify-content-between mb-3">
+      <button mat-button (click)="goBackToFuelList()">
+        <mat-icon>arrow_back</mat-icon> Back to List
+      </button>
+      
+      <div>
+        <button mat-button color="primary" (click)="editFuel()">
+          <mat-icon>edit</mat-icon> Edit
+        </button>
+        <button mat-button color="warn" (click)="deleteFuel()">
+          <mat-icon>delete</mat-icon> Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

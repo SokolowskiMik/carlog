@@ -62,6 +62,16 @@
           Technical inspection date is required
         </mat-error>
       </mat-form-field>
+    
+    <mat-form-field class="mb-3">
+        <mat-label>Insurance end date</mat-label>
+        <input matInput [matDatepicker]="insurancePicker" formControlName="insuranceEndDate">
+        <mat-datepicker-toggle matIconSuffix [for]="insurancePicker"></mat-datepicker-toggle>
+        <mat-datepicker #insurancePicker></mat-datepicker>
+        <mat-error *ngIf="carForm.get('insuranceEndDate')?.hasError('required')">
+          Insurance end date is required
+        </mat-error>
+    </mat-form-field>
   
     <mat-form-field  class="mb-3">
       <mat-label>Registration Certificate Number</mat-label>

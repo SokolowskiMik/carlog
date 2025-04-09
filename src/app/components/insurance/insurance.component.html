@@ -1,4 +1,4 @@
-<div class="d-flex flex-column gap-1 container-fluid container-md">
+<!-- <div class="d-flex flex-column gap-1 container-fluid container-md">
     <h2 class="text-center">Insurance</h2>
 @if(insurance.insuranceId != 0){
 
@@ -51,7 +51,7 @@ Insurer
     </mat-card-content>
   </mat-card>
 
-  <button mat-button [routerLink]="['/insurance-form',insurance.insuranceId,carId]">
+  <button mat-button [routerLink]="['/insurance-form',carId]">
     <i class="material-icons">edit</i>Edit
   </button>
 }
@@ -60,7 +60,7 @@ Insurer
         <i class="material-icons">add</i>Add
       </button>
 }
-</div>
+</div> -->
 
 
 <!-- {{ insurance.type_of_insurance }}
@@ -70,3 +70,94 @@ Insurer
 {{ insurance.start_of_insurance }}
 {{ insurance.end_of_insurance }}
 {{ insurance.phone_number_to_call }} -->
+
+<div class="d-flex flex-column gap-1 container-fluid container-md">
+    <h2 class="text-center">Insurance</h2>
+    
+    <div *ngIf="loading" class="text-center my-4">
+        <span>Loading...</span>
+    </div>
+    
+    <div *ngIf="error" class="text-center my-4 text-danger">
+        <span>Error loading insurance information</span>
+    </div>
+
+    <ng-container *ngIf="!loading && !error">
+        <ng-container *ngIf="insurance; else noInsurance">
+            <div>Insurer</div>
+            <mat-card appearance="outlined" class="mb-2">
+                <mat-card-content>
+                    <div>{{ insurance.insurer }}</div>
+                </mat-card-content>
+            </mat-card>
+            
+            <div>Type of Insurance</div>
+            <mat-card appearance="outlined" class="mb-2">
+                <mat-card-content>
+                    <div>{{ insurance.typeOfInsurance }}</div>
+                </mat-card-content>
+            </mat-card>
+            
+            <div>Service</div>
+            <mat-card appearance="outlined" class="mb-2">
+                <mat-card-content>
+                    <div>{{ insurance.service }}</div>
+                </mat-card-content>
+            </mat-card>
+            
+            <div>Policy Number</div>
+            <mat-card appearance="outlined" class="mb-2">
+                <mat-card-content>
+                    <div>{{ insurance.policyNumber }}</div>
+                </mat-card-content>
+            </mat-card>
+            
+            <div>Date of Contract Conclusion</div>
+            <mat-card appearance="outlined" class="mb-2">
+                <mat-card-content>
+                    <div>{{ insurance.dateOfContractConclusion | date:'mediumDate' }}</div>
+                </mat-card-content>
+            </mat-card>
+            
+            <div>Start of Insurance</div>
+            <mat-card appearance="outlined" class="mb-2">
+                <mat-card-content>
+                    <div>{{ insurance.startOfInsurance | date:'mediumDate' }}</div>
+                </mat-card-content>
+            </mat-card>
+            
+            <div>End of Insurance</div>
+            <mat-card appearance="outlined" class="mb-2">
+                <mat-card-content>
+                    <div>{{ insurance.endOfInsurance | date:'mediumDate' }}</div>
+                </mat-card-content>
+            </mat-card>
+            
+            <div>Phone Number to Call</div>
+            <mat-card appearance="outlined" class="mb-2">
+                <mat-card-content>
+                    <div>{{ insurance.phoneNumberToCall }}</div>
+                </mat-card-content>
+            </mat-card>
+
+            <div class="d-flex gap-2">
+                <button mat-button [routerLink]="['/insurance-form',carId]">
+                    <i class="material-icons">edit</i>Edit
+                </button>
+                
+                <button mat-button color="warn" (click)="deleteInsurance()">
+                    <i class="material-icons">delete</i>Delete
+                </button>
+            </div>
+        </ng-container>
+
+        <ng-template #noInsurance>
+            <div class="text-center my-4">
+                <p>No insurance information found for this car.</p>
+                <button mat-raised-button color="primary" [routerLink]="['/insurance-form',carId]">
+                    <i class="material-icons">add</i>Add Insurance
+                </button>
+            </div>
+        </ng-template>
+    </ng-container>
+</div>

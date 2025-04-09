@@ -1,4 +1,4 @@
-<form [formGroup]="noteForm" (ngSubmit)="onSubmit()" class="d-flex flex-column container-fluid container-md">
+<!-- <form [formGroup]="noteForm" (ngSubmit)="onSubmit()" class="d-flex flex-column container-fluid container-md">
     @if(noteId){
         <h2 class="text-center">Edit Note</h2>
     }
@@ -29,4 +29,112 @@
         Submit
       </button>
     
-  </form>
+  </form> -->
+
+  <div class="container-fluid container-md">
+    <form [formGroup]="noteForm" (ngSubmit)="onSubmit()">
+      <h2 class="text-center">{{noteId ? 'Edit' : 'Add'}} Note</h2>
+  
+      <!-- Loading spinner -->
+      <div *ngIf="isLoading" class="d-flex justify-content-center my-4">
+        <mat-spinner></mat-spinner>
+      </div>
+  
+      <div *ngIf="!isLoading">
+        <!-- Title -->
+        <mat-form-field class="w-100 mb-3">
+          <mat-label>Title</mat-label>
+          <input matInput type="text" formControlName="title" placeholder="Note title">
+          <mat-error *ngIf="noteForm.get('title')?.hasError('required')">Title is required</mat-error>
+        </mat-form-field>
+  
+        <!-- Description -->
+        <mat-form-field class="w-100 mb-3">
+          <mat-label>Description</mat-label>
+          <textarea matInput formControlName="description" placeholder="Note description" rows="4"></textarea>
+          <mat-error *ngIf="noteForm.get('description')?.hasError('required')">Description is required</mat-error>
+          <mat-error *ngIf="noteForm.get('description')?.hasError('minlength')">Description must be at least 10 characters long</mat-error>
+        </mat-form-field>
+  
+        <!-- Images Section -->
+        <div class="mb-4">
+          <h3>Images</h3>
+          
+          <!-- Existing images (if editing) -->
+          <div *ngIf="existingImageUrls.length > 0" class="mb-3">
+            <h4>Current Images</h4>
+            <div class="d-flex flex-wrap gap-2 mb-2">
+              <div *ngFor="let imageUrl of existingImageUrls; let i = index" class="position-relative">
+                <img [src]="imageUrl" alt="Existing image" class="img-thumbnail" style="width: 100px; height: 100px; object-fit: cover;">
+                <button type="button" mat-mini-fab color="warn" class="position-absolute top-0 end-0" 
+                        style="transform: translate(30%, -30%)" (click)="removeExistingImage(i)">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Upload new images -->
+          <div class="mb-3">
+            <label for="imageUpload" class="form-label">Upload Images</label>
+            <input type="file" class="form-control" id="imageUpload" multiple accept="image/*" (change)="onImagesSelected($event)">
+          </div>
+          
+          <!-- Image previews -->
+          <div *ngIf="imagePreviewUrls.length > 0" class="mb-3">
+            <h4>New Images</h4>
+            <div class="d-flex flex-wrap gap-2">
+              <div *ngFor="let previewUrl of imagePreviewUrls; let i = index" class="position-relative">
+                <img [src]="previewUrl" alt="Preview" class="img-thumbnail" style="width: 100px; height: 100px; object-fit: cover;">
+                <button type="button" mat-mini-fab color="warn" class="position-absolute top-0 end-0" 
+                        style="transform: translate(30%, -30%)" (click)="removeImage(i)">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Audio Section -->
+        <div class="mb-4">
+          <h3>Audio</h3>
+          
+          <!-- Record audio -->
+          <div class="d-flex gap-2 mb-3">
+            <button type="button" mat-raised-button color="primary" [disabled]="isRecording" (click)="startRecording()" *ngIf="!isRecording">
+              <mat-icon>mic</mat-icon> Start Recording
+            </button>
+            <button type="button" mat-raised-button color="warn" *ngIf="isRecording" (click)="stopRecording()">
+              <mat-icon>stop</mat-icon> Stop Recording
+            </button>
+          </div>
+          
+          <!-- Or upload audio file -->
+          <div class="mb-3">
+            <label for="audioUpload" class="form-label">Or Upload Audio File</label>
+            <input type="file" class="form-control" id="audioUpload" accept="audio/*" (change)="onAudioFileSelected($event)">
+          </div>
+          
+          <!-- Audio preview -->
+          <div *ngIf="audioUrl" class="mb-3">
+            <div class="d-flex justify-content-between align-items-center p-2 border rounded">
+              <audio controls [src]="audioUrl"></audio>
+              <button type="button" mat-icon-button color="warn" (click)="removeAudio()">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Form actions -->
+        <div class="d-flex gap-2 mb-3">
+          <button type="submit" mat-raised-button color="primary" [disabled]="noteForm.invalid || isLoading" class="flex-grow-1">
+            {{noteId ? 'Update' : 'Save'}} Note
+          </button>
+          <button type="button" mat-button [routerLink]="['/notes', carId]">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>

@@ -1,18 +1,48 @@
 <div class="container-fluid">
     <h2 class="text-center mb-3">Garage</h2>
-    <div class="d-flex flex-column gap-2 mb-3">
-        <button mat-raised-button class="w-100" *ngFor="let car of cars" [routerLink]="['/current-car',car.id]" >
-            <div class="d-flex align-items-center">
-                <div class="">
-                    <img [src]="car.image" alt="{{ car.name }}" width="40" height="40" style="border-radius: 50%; margin-right: 8px;">
-                </div>
-                <div class="">
-                    {{ car.name }}
-                </div>
-            </div> 
 
+    <!-- Loading spinner -->
+    <div *ngIf="isLoading" class="d-flex justify-content-center my-5">
+        <mat-spinner></mat-spinner>
+    </div>
+    
+    <!-- No cars message -->
+    <div *ngIf="!isLoading && cars.length === 0" class="text-center my-4">
+        <p>You don't have any cars in your garage yet.</p>
+    </div>
+
+    <!-- Cars list -->
+    <div class="d-flex flex-column gap-2 mb-3" *ngIf="!isLoading && cars.length > 0">
+        <button mat-raised-button class="w-100" *ngFor="let car of cars" (click)="navigateToCarDetails(car.id)">
+            <div class="d-flex align-items-center justify-content-between w-100">
+                <div class="d-flex align-items-center">
+                    <div>
+                        <img [src]="car.image || 'assets/default-car.png'" alt="{{ car.name }}" width="40" height="40" style="border-radius: 50%; margin-right: 8px; object-fit: cover;">
+                    </div>
+                    <div class="text-start">
+                        <strong>{{ car.name }}</strong>
+                        <div class="text-muted small">{{ car.model }} ({{ car.year }})</div>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <button mat-icon-button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
+                        <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu #menu="matMenu">
+                        <button mat-menu-item (click)="editCar(car.id); $event.stopPropagation()">
+                            <mat-icon>edit</mat-icon>
+                            <span>Edit</span>
+                        </button>
+                        <button mat-menu-item (click)="deleteCar(car.id); $event.stopPropagation()">
+                            <mat-icon>delete</mat-icon>
+                            <span>Delete</span>
+                        </button>
+                    </mat-menu>
+                </div>
+            </div>
         </button>
     </div>
+    
     <button mat-raised-button class="w-100" [routerLink]="['/garage-form']">Add Car</button>
     <!-- <div class="d-flex justify-content-center">
         <mat-list>

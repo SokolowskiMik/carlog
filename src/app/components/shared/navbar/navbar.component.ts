@@ -23,7 +23,7 @@ export class NavbarComponent {
     const currentUrl = window.location.pathname;
     const carId = currentUrl.split('/')[2];  
     const insuranceId = 1
-    this.router.navigate(['/insurance/', insuranceId,carId]);
+    this.router.navigate(['/insurance/',carId]);
   }
 
   navigateToCurrentCar() {
@@ -46,8 +46,15 @@ export class NavbarComponent {
        carId = currentUrl.split('/')[2];
     }
     else{
-       carId = currentUrl.split('/')[3];  
+       carId = currentUrl.split('/')[2];  
     }
     this.router.navigate(['/fuel', carId]);
+  }
+
+  navigateToNotes() {
+    const currentUrl = window.location.pathname;
+    var carId ="";
+    carId = currentUrl.split('/')[2];
+    this.router.navigate(['/notes', carId]);
   }
 }

@@ -1,56 +1,236 @@
+// import { CommonModule } from '@angular/common';
+// import { Component } from '@angular/core';
+// import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+// import { MatButtonModule } from '@angular/material/button';
+// import { MatNativeDateModule } from '@angular/material/core';
+// import { MatDatepickerModule } from '@angular/material/datepicker';
+// import { MatFormFieldModule } from '@angular/material/form-field';
+// import { MatInputModule } from '@angular/material/input';
+// import { ActivatedRoute } from '@angular/router';
+
+// @Component({
+//   selector: 'app-fuel-form',
+//   standalone: true,
+//   imports: [FormsModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule,CommonModule,MatButtonModule,MatDatepickerModule,MatNativeDateModule],
+//   templateUrl: './fuel-form.component.html',
+//   styleUrl: './fuel-form.component.scss'
+// })
+// export class FuelFormComponent {
+//   fuelForm!: FormGroup;
+//   fuelId!: number | null;
+//   constructor(private route: ActivatedRoute, private fb: FormBuilder) {}
+
+//   ngOnInit() {
+//     this.fuelId = this.route.snapshot.paramMap.get('fuelId') ? +this.route.snapshot.paramMap.get('fuelId')! : null;
+//     this.fuelForm = this.fb.group({
+//       name: ['', Validators.required],
+//       startingPoint: ['', Validators.required],
+//       destination: ['', Validators.required],
+//       distance: ['', [Validators.required, Validators.min(1)]], 
+//       fuelConsumption: ['', [Validators.required, Validators.min(1)]],
+//       petrolPrice: ['', [Validators.required, Validators.min(0.1)]], 
+//       totalCost: [{ value: '',  }] 
+//     });
+
+//     this.fuelForm.valueChanges.subscribe(values => {
+//       this.calculateTotalCost();
+//     });
+//   }
+
+//   calculateTotalCost() {
+//     const distance = this.fuelForm.get('distance')?.value;
+//     const fuelConsumption = this.fuelForm.get('fuelConsumption')?.value;
+//     const petrolPrice = this.fuelForm.get('petrolPrice')?.value;
+
+//     if (distance && fuelConsumption && petrolPrice) {
+//       const totalCost = (distance / 100) * fuelConsumption * petrolPrice;
+//       this.fuelForm.patchValue({ totalCost: totalCost.toFixed(2) }, { emitEvent: false });
+//     }
+//   }
+
+//   onSubmit() {
+//     if (this.fuelForm.valid) {
+//       console.log('Fuel Form Submitted:', this.fuelForm.value);
+//     }
+//   }
+// }
+
+
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { ActivatedRoute } from '@angular/router';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { FuelService } from '../../../data/fuel.service';
+import { Fuel } from '../../../data/fuel';
 
 @Component({
   selector: 'app-fuel-form',
   standalone: true,
-  imports: [FormsModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule,CommonModule,MatButtonModule,MatDatepickerModule,MatNativeDateModule],
+  imports: [
+    FormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    ReactiveFormsModule,
+    CommonModule,
+    MatButtonModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatProgressSpinnerModule,
+    MatSnackBarModule,
+    RouterModule
+  ],
   templateUrl: './fuel-form.component.html',
   styleUrl: './fuel-form.component.scss'
 })
-export class FuelFormComponent {
+export class FuelFormComponent implements OnInit {
   fuelForm!: FormGroup;
-  fuelId!: number | null;
-  constructor(private route: ActivatedRoute, private fb: FormBuilder) {}
+  fuelId: string | null = null;
+  carId: string = '';
+  isLoading = false;
 
-  ngOnInit() {
-    this.fuelId = this.route.snapshot.paramMap.get('fuelId') ? +this.route.snapshot.paramMap.get('fuelId')! : null;
+  constructor(
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private router: Router,
+    private fuelService: FuelService,
+    private snackBar: MatSnackBar
+  ) {}
+
+  ngOnInit(): void {
+    // First try to get carId from route params
+    this.carId = this.route.snapshot.paramMap.get('carId') || '';
+    this.fuelId = this.route.snapshot.paramMap.get('fuelId');
+    
+    // If not in params, try to extract from URL
+    if (!this.carId) {
+      const currentUrl = window.location.pathname;
+      console.log('Current URL:', currentUrl);
+      
+      if (currentUrl.includes('fuel-form/')) {
+        // Get the part after "fuel-form/"
+        this.carId = currentUrl.split('fuel-form/')[1];
+        console.log('Extracted carId from URL:', this.carId);
+      }
+    }
+
+    // Make sure fuelId is not the same as carId (which would happen in "create new" mode)
+    if (this.fuelId === this.carId) {
+      this.fuelId = null;
+      console.log('Reset fuelId because it matched carId');
+    }
+
     this.fuelForm = this.fb.group({
       name: ['', Validators.required],
       startingPoint: ['', Validators.required],
       destination: ['', Validators.required],
       distance: ['', [Validators.required, Validators.min(1)]], 
-      fuelConsumption: ['', [Validators.required, Validators.min(1)]],
+      fuelConsumption: ['', [Validators.required, Validators.min(0.1)]],
       petrolPrice: ['', [Validators.required, Validators.min(0.1)]], 
-      totalCost: [{ value: '',  }] 
+      totalCost: [{ value: '', disabled: true }] 
     });
 
-    this.fuelForm.valueChanges.subscribe(values => {
+    // Calculate total cost when form values change
+    this.fuelForm.valueChanges.subscribe(() => {
       this.calculateTotalCost();
+    });
+
+    if (this.fuelId) {
+      this.loadFuelData();
+    }
+  }
+
+  loadFuelData(): void {
+    if (!this.fuelId || !this.carId) return;
+
+    this.isLoading = true;
+    this.fuelService.getFuel(this.carId, this.fuelId).subscribe({
+      next: (fuel) => {
+        if (fuel) {
+          this.fuelForm.patchValue({
+            name: fuel.name,
+            startingPoint: fuel.startingPoint,
+            destination: fuel.destination,
+            distance: fuel.distance,
+            fuelConsumption: fuel.fuelConsumption,
+            petrolPrice: fuel.petrolPrice,
+            totalCost: fuel.totalCost.toFixed(2)
+          });
+        } else {
+          this.snackBar.open('Fuel record not found, creating a new one', 'Close', { duration: 3000 });
+        }
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error loading fuel record:', err);
+        this.snackBar.open('Error loading fuel record details', 'Close', { duration: 3000 });
+        this.isLoading = false;
+      }
     });
   }
 
-  calculateTotalCost() {
+  calculateTotalCost(): void {
     const distance = this.fuelForm.get('distance')?.value;
     const fuelConsumption = this.fuelForm.get('fuelConsumption')?.value;
     const petrolPrice = this.fuelForm.get('petrolPrice')?.value;
 
     if (distance && fuelConsumption && petrolPrice) {
-      const totalCost = (distance / 100) * fuelConsumption * petrolPrice;
-      this.fuelForm.patchValue({ totalCost: totalCost.toFixed(2) }, { emitEvent: false });
+      const totalCost = this.fuelService.calculateTotalCost(distance, fuelConsumption, petrolPrice);
+      this.fuelForm.get('totalCost')?.setValue(totalCost.toFixed(2), { emitEvent: false });
     }
   }
 
-  onSubmit() {
-    if (this.fuelForm.valid) {
-      console.log('Fuel Form Submitted:', this.fuelForm.value);
+  async onSubmit(): Promise<void> {
+    if (this.fuelForm.invalid) {
+      this.snackBar.open('Please fix the errors in the form', 'Close', { duration: 3000 });
+      return;
+    }
+
+    if (!this.carId) {
+      console.error('No car ID available when submitting form');
+      this.snackBar.open('Error: Car ID not found', 'Close', { duration: 3000 });
+      return;
+    }
+
+    try {
+      this.isLoading = true;
+      const formValues = this.fuelForm.getRawValue();
+      
+      // Ensure proper numeric values
+      const fuelData: Fuel = {
+        name: formValues.name,
+        startingPoint: formValues.startingPoint,
+        destination: formValues.destination,
+        distance: parseFloat(formValues.distance),
+        fuelConsumption: parseFloat(formValues.fuelConsumption),
+        petrolPrice: parseFloat(formValues.petrolPrice),
+        totalCost: parseFloat(formValues.totalCost)
+      };
+      
+      if (this.fuelId) {
+        // Update existing record
+        await this.fuelService.updateFuel(this.carId, this.fuelId, fuelData);
+        this.snackBar.open('Fuel record updated successfully', 'Close', { duration: 3000 });
+      } else {
+        // Add new record
+        await this.fuelService.addFuel(this.carId, fuelData);
+        this.snackBar.open('Fuel record added successfully', 'Close', { duration: 3000 });
+      }
+      
+      // Navigate back to fuel list
+      this.router.navigate(['/car', this.carId, 'fuel']);
+      
+    } catch (error) {
+      console.error('Error saving fuel record:', error);
+      this.snackBar.open('Error saving fuel record', 'Close', { duration: 3000 });
+    } finally {
+      this.isLoading = false;
     }
   }
 }

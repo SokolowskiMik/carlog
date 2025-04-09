@@ -3,7 +3,7 @@
     <div class="d-flex justify-content-center justify-content-md-between">
 
         <div class="d-flex flex-column align-items-center justify-content-center">
-            <button mat-button class="d-flex flex-column align-items-center btn btn-sm p-1" [disabled]="isDisabled" [routerLink]="['/notes']">
+            <button mat-button class="d-flex flex-column align-items-center btn btn-sm p-1" [disabled]="isDisabled" (click)="navigateToNotes()">
                 <i class="material-icons fs-6">notes</i>
                 <span class="fs-6">Notes</span>
             </button>
