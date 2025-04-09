@@ -9,6 +9,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { VibrationsService } from '../../data/vibrations.service';
+
 @Component({
   selector: 'app-garage',
   standalone: true,
@@ -29,15 +31,24 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 export class GarageComponent implements OnInit {
   cars: any[] = [];
   isLoading = false;
+  insuranceExpiring: string[] = [];
   
   constructor(
     private carService: CarService,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private messagesService: VibrationsService
   ) {}
 
   ngOnInit() {
     this.loadCars();
+    this.messagesService.checkInsuranceExpirations().subscribe(names => {
+      this.insuranceExpiring = names;
+
+      if (names.length > 0) {
+        this.messagesService.triggerAlert();
+      }
+    });
   }
 
   loadCars() {
