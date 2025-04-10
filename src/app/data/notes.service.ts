@@ -85,11 +85,25 @@ export class NotesService {
   async deleteNote(carId: string, noteId: string): Promise<void> {
     const user = this.auth.currentUser;
     if (!user) throw new Error('No authenticated user');
-
+  
     // First get the note to check for files to delete
     try {
       const noteDoc = doc(this.firestore, `users/${user.uid}/cars/${carId}/notes/${noteId}`);
-      const noteSnapshot = await docData(noteDoc, { idField: 'id' }).pipe().toPromise();
+      
+      // Create a Promise from the Observable instead of using toPromise()
+      const noteSnapshot = await new Promise((resolve) => {
+        const subscription = docData(noteDoc, { idField: 'id' }).subscribe({
+          next: (data) => {
+            resolve(data);
+            subscription.unsubscribe();
+          },
+          error: (err) => {
+            console.error('Error getting note data:', err);
+            resolve(null);
+            subscription.unsubscribe();
+          }
+        });
+      });
       
       if (noteSnapshot) {
         const note = noteSnapshot as Note;

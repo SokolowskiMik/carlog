@@ -25,7 +25,11 @@ export class LoginComponent {
   isSubmittingStandardAuth: boolean = false;
   isSubmittingTwitterAuth: boolean = false;
 
-  constructor(public authService : AuthService, private fb: FormBuilder, private router: Router) {}
+  constructor(
+    public authService : AuthService, 
+    private fb: FormBuilder,
+    private router: Router,
+  ) {}
 
   ngOnInit() {
     this.loginForm = this.fb.group({

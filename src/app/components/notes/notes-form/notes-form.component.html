@@ -70,6 +70,19 @@
           <div class="mb-3">
             <label for="imageUpload" class="form-label">Upload Images</label>
             <input type="file" class="form-control" id="imageUpload" multiple accept="image/*" (change)="onImagesSelected($event)">
+
+            <!-- Part resposnsible for picture taking / replace this part -->
+            
+            <button type="button" class="btn btn-primary mt-2" (click)="openCamera()">📸 Take Photo</button>
+            <!-- Fullscreen camera overlay -->
+            <div class="camera-overlay" *ngIf="isCameraOpen">
+              <video #cameraVideo autoplay playsinline></video>
+              <button type="button" class="btn btn-danger capture-btn" (click)="captureFromCamera()">Capture</button>
+              <button type="button" class="btn btn-secondary close-btn" (click)="closeCamera()">Cancel</button>
+            </div>
+
+            <!-- End of picture taking part  -->
+
           </div>
           
           <div *ngIf="imagePreviewUrls.length > 0" class="mb-3">
