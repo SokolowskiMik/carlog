@@ -57,7 +57,7 @@
 
 
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -70,6 +70,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { NotesService } from '../../../data/notes.service';
 import { Note } from '../../../data/notes';
+import { CameraService } from '../../../data/camera.service';
 
 @Component({
   selector: 'app-notes-form',
@@ -92,24 +93,28 @@ import { Note } from '../../../data/notes';
   styleUrl: './notes-form.component.scss'
 })
 export class NotesFormComponent implements OnInit {
+  @ViewChild('cameraVideo') cameraVideo!: ElementRef<HTMLVideoElement>;
+
   noteForm!: FormGroup;
   noteId: string | null = null;
   carId: string = '';
   selectedImageFiles: File[] = [];
   selectedAudioFile: File | null = null;
-  isRecording = false;
+  isRecording: boolean = false;
   mediaRecorder: MediaRecorder | null = null;
   audioChunks: Blob[] = [];
   audioUrl: string | null = null;
   imagePreviewUrls: string[] = [];
   existingImageUrls: string[] = [];
+  isCameraOpen: boolean = false;
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
     private notesService: NotesService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private cameraService: CameraService,
   ) {}
 
   ngOnInit(): void {
@@ -283,6 +288,50 @@ export class NotesFormComponent implements OnInit {
 
   removeExistingImage(index: number): void {
     this.existingImageUrls.splice(index, 1);
+  }
+
+  async openCamera() {
+    this.isCameraOpen = true;
+  
+    setTimeout(async () => {
+      if (!this.cameraVideo?.nativeElement) {
+        console.warn('cameraVideo not available yet');
+        return;
+      }
+  
+      try {
+        await this.cameraService.startCamera(this.cameraVideo.nativeElement);
+      } catch (err) {
+        this.snackBar.open('Camera access failed', 'Close', { duration: 3000 });
+        this.isCameraOpen = false;
+      }
+    }, 100);
+  }
+  
+  closeCamera() {
+    this.cameraService.stopCamera();
+    this.isCameraOpen = false;
+  }
+  
+  captureFromCamera() {
+    const blob = this.cameraService.takePhotoBlob();
+    if (!blob) {
+      this.snackBar.open('Failed to take photo', 'Close', { duration: 3000 });
+      return;
+    }
+  
+    // Convert blob to File for upload
+    const file = new File([blob], `captured_${Date.now()}.png`, { type: 'image/png' });
+    this.selectedImageFiles.push(file);
+  
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.imagePreviewUrls.push(e.target.result);
+    };
+    reader.readAsDataURL(file);
+  
+    this.closeCamera();
   }
 
   async onSubmit(): Promise<void> {
