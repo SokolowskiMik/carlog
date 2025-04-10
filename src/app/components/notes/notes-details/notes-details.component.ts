@@ -86,19 +86,9 @@ export class NotesDetailsComponent implements OnInit {
     this.noteId = this.route.snapshot.paramMap.get('noteId') || '';
 
     if (!this.carId || !this.noteId) {
-      // Extract from URL if not in route params
       const currentUrl = window.location.pathname;
-      const segments = currentUrl.split('/');
-      
-      const carIndex = segments.indexOf('car');
-      if (carIndex !== -1 && segments.length > carIndex + 1) {
-        this.carId = segments[carIndex + 1];
-      }
-      
-      const noteIndex = segments.lastIndexOf(segments[segments.length - 1]);
-      if (noteIndex !== -1) {
-        this.noteId = segments[noteIndex];
-      }
+      this.carId = currentUrl.split('/')[2];
+      this.noteId = currentUrl.split('/')[3];
     }
 
     if (this.carId && this.noteId) {
@@ -138,7 +128,7 @@ export class NotesDetailsComponent implements OnInit {
   }
 
   editNote(): void {
-    this.router.navigate(['/car', this.carId, 'notes-form', this.noteId]);
+    this.router.navigate(['/notes-form', this.carId,  this.noteId]);
   }
 
   deleteNote(): void {
@@ -147,7 +137,7 @@ export class NotesDetailsComponent implements OnInit {
       this.notesService.deleteNote(this.carId, this.noteId)
         .then(() => {
           this.snackBar.open('Note deleted successfully', 'Close', { duration: 3000 });
-          this.router.navigate(['/car', this.carId, 'notes']);
+          this.router.navigate(['/notes', this.carId]);
         })
         .catch((error) => {
           console.error('Error deleting note:', error);
