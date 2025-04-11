@@ -12,6 +12,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { VibrationsService } from '../../data/vibrations.service';
 import { DialogComponent } from '../shared/dialog/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { ExpiringInsurenceDialogComponent } from '../shared/expiring-insurence-dialog/expiring-insurence-dialog.component';
 
 @Component({
   selector: 'app-garage',
@@ -51,6 +52,14 @@ export class GarageComponent implements OnInit {
       if (names.length > 0) {
         this.messagesService.triggerAlert();
       }
+      const dialogRef = this.dialog.open(ExpiringInsurenceDialogComponent, {
+        data: { names : names}
+      });
+  
+      return dialogRef.afterClosed().toPromise().then(result => {
+        return result;
+      });
+
     });
   }
 

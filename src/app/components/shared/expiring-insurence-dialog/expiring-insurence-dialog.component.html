@@ -1,0 +1,10 @@
+<h2 mat-dialog-title>Expiring Insurance</h2>
+<mat-dialog-content>
+  <p>The insurance in going to expire in less than a month in this cars:</p>
+  <div *ngFor="let name of data.names">
+    car name : {{ name }}
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">I Understand</button>
+</mat-dialog-actions>
