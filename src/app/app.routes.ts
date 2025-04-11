@@ -16,7 +16,7 @@ import { LoginComponent } from './components/login/login.component';
 import { authGuard } from './data/auth.guard';
 
 export const routes: Routes = [
-    {path: 'garage', component: GarageComponent, canActivate: [authGuard], data: { renderMode: 'default' } },
+    {path: 'garage', component: GarageComponent, canActivate: [authGuard] },
     {path: 'garage-form', component: GarageFormComponent, canActivate: [authGuard], data: { renderMode: 'default' }  },
     {path: 'garage-form/:carId', component: GarageFormComponent, canActivate: [authGuard], data: { renderMode: 'default' }  },
     {path: 'current-car/:carId', component: CurrentCarComponent, canActivate: [authGuard], data: { renderMode: 'default' }  },
@@ -39,7 +39,7 @@ export const routes: Routes = [
     {path: 'notes-form', component: NotesFormComponent, canActivate: [authGuard], data: { renderMode: 'default' }  },
     {path: 'notes-form/:noteId', component: NotesFormComponent, canActivate: [authGuard], data: { renderMode: 'default' }  },
 
-    {path: 'register', component: RegisterComponent, data: { renderMode: 'default' } },
-    {path: 'login', component: LoginComponent, data: { renderMode: 'default' } },
-    {path: '**', component: GarageComponent, canActivate: [authGuard], data: { renderMode: 'default' }  },
+    {path: 'register', component: RegisterComponent,},
+    {path: 'login', component: LoginComponent },
+    {path: '**', component: GarageComponent, canActivate: [authGuard]  },
 ];
