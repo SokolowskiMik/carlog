@@ -104,6 +104,17 @@ export class GarageFormComponent {
       this.snackBar.open('Error saving car data', 'Close', { duration: 3000 });
     }
   }
+
+  goBack()
+  {
+    if(this.carId)
+    {
+      this.router.navigate(['/current-car',this.carId])
+    }
+    else{
+      this.router.navigate(['/garage'])
+    }
+  }
   
 }
 function formatDateOnly(date: Date): string {

@@ -1,10 +1,15 @@
- <!-- <mat-card class="container-fluid container-md" appearance="outlined" >
+ @if(note){
+  <mat-card class="container-fluid container-md" appearance="outlined" >
     <mat-card-header class="justify-content-center" >
       <mat-card-title ><h6>{{note.title}}</h6></mat-card-title>
     </mat-card-header>
-    <img mat-card-image [src]="note.images[currentIndex]" alt="Photo">
+    <img mat-card-image [src]="note.images[currentImageIndex]" alt="Photo">
     <mat-card-content>
         <div class="d-flex flex-column">
+          <div *ngIf="note.audioUrl" class="px-3 py-2">
+            <h3>Audio Note</h3>
+            <audio controls [src]="note.audioUrl" class="w-100"></audio>
+          </div>
             <div class=" d-flex justify-content-between mb-3">
                 <button mat-button (click)="prevImage()">Previous</button>
                 <button mat-button (click)="nextImage()">Next</button>
@@ -12,76 +17,17 @@
             {{note.description}}
         </div>
     </mat-card-content>
-    <mat-card-actions class="justify-content-center">
-        <button mat-button [routerLink]="['/notes-form',note.noteId]">
+    <mat-card-actions class="justify-content-around">
+      <button mat-button (click)="goBackToNotes()">
+        <mat-icon>arrow_back</mat-icon> Back
+      </button>
+        <button mat-button (click)="editNote()">
             <i class="material-icons">edit</i>Edit
-          </button>
-    </mat-card-actions>
-  </mat-card> -->
-
-  <div class="container-fluid container-md">
-    <!-- Loading spinner -->
-    <div *ngIf="isLoading" class="d-flex justify-content-center my-4">
-      <mat-spinner></mat-spinner>
-    </div>
-  
-    <!-- Error message -->
-    <div *ngIf="error" class="alert alert-danger text-center my-4">
-      An error occurred while loading note details.
-    </div>
-  
-    <!-- Note Details -->
-    <mat-card *ngIf="!isLoading && !error && note" appearance="outlined" class="mb-4">
-      <mat-card-header>
-        <mat-card-title>{{ note.title }}</mat-card-title>
-        <mat-card-subtitle *ngIf="note.createdAt">
-          Created: {{ note.createdAt.toDate ? note.createdAt.toDate() : note.createdAt | date:'medium' }}
-        </mat-card-subtitle>
-      </mat-card-header>
-  
-      <!-- Image Gallery -->
-      <div *ngIf="note.images && note.images.length > 0" class="position-relative">
-        <img mat-card-image [src]="note.images[currentImageIndex]" alt="Note image" class="note-image">
-        
-        <!-- Image navigation controls -->
-        <div class="d-flex justify-content-between align-items-center py-2 px-3">
-          <button mat-icon-button [disabled]="note.images.length <= 1" (click)="prevImage()">
-            <mat-icon>navigate_before</mat-icon>
-          </button>
-          
-          <span *ngIf="note.images.length > 1">
-            {{ currentImageIndex + 1 }} / {{ note.images.length }}
-          </span>
-          
-          <button mat-icon-button [disabled]="note.images.length <= 1" (click)="nextImage()">
-            <mat-icon>navigate_next</mat-icon>
-          </button>
-        </div>
-      </div>
-  
-      <!-- Audio Player -->
-      <div *ngIf="note.audioUrl" class="px-3 py-2">
-        <h3>Audio Note</h3>
-        <audio controls [src]="note.audioUrl" class="w-100"></audio>
-      </div>
-  
-      <mat-card-content class="mt-2">
-        <p class="note-description">{{ note.description }}</p>
-      </mat-card-content>
-  
-      <mat-card-actions class="d-flex justify-content-between">
-        <button mat-button (click)="goBackToNotes()">
-          <mat-icon>arrow_back</mat-icon> Back
-        </button>
-        
-        <div>
-          <button mat-button color="primary" (click)="editNote()">
-            <mat-icon>edit</mat-icon> Edit
           </button>
           <button mat-button color="warn" (click)="deleteNote()">
             <mat-icon>delete</mat-icon> Delete
           </button>
-        </div>
-      </mat-card-actions>
-    </mat-card>
-  </div>
+    </mat-card-actions>
+  </mat-card>
+
+ }

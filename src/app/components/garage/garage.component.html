@@ -1,7 +1,7 @@
 <div class="container-fluid">
     <h2 class="text-center mb-3">Garage</h2>
     <div class="d-flex flex-column gap-2 mb-3">
-        <button mat-raised-button class="w-100" *ngFor="let car of cars" [routerLink]="['/current-car',car.id]" >
+        <button mat-raised-button class="w-100" *ngFor="let car of cars" (click)="navigateToCarDetails(car.id)" >
             <div class="d-flex align-items-center">
                 <div class="">
                     <img [src]="car.image" alt="{{ car.name }}" width="40" height="40" style="border-radius: 50%; margin-right: 8px; object-fit: cover;">

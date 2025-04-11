@@ -134,7 +134,7 @@
           <button type="submit" mat-raised-button color="primary" [disabled]="fuelForm.invalid " >
             {{fuelId ? 'Update' : 'Save'}} Fuel Record
           </button>
-          <button type="button" mat-raised-button [routerLink]="['/car', carId, 'fuel']">
+          <button type="button" mat-raised-button (click)="goBackToFuelDetails()">
             Cancel
           </button>
         </div>

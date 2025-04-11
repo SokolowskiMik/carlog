@@ -20,41 +20,22 @@ export class NavbarComponent {
     });
   }
   navigateToInsurance() {
-    const currentUrl = window.location.pathname;
-    const carId = currentUrl.split('/')[2];  
-    const insuranceId = 1
+    var carId = localStorage.getItem("carId")
     this.router.navigate(['/insurance/',carId]);
   }
 
   navigateToCurrentCar() {
-    const currentUrl = window.location.pathname;
-    var carId ="";
-    if(this.router.url === '/insurance'){
-      carId = currentUrl.split('/')[3];
-    }
-    else{
-
-      carId = currentUrl.split('/')[2];
-    }
+    var carId = localStorage.getItem("carId")
     this.router.navigate(['/current-car', carId]);
   }
 
   navigateToFuel() {
-    const currentUrl = window.location.pathname;
-    var carId ="";
-    if(this.router.url === '/current-car'){
-       carId = currentUrl.split('/')[2];
-    }
-    else{
-       carId = currentUrl.split('/')[2];  
-    }
+    var carId = localStorage.getItem("carId")
     this.router.navigate(['/fuel', carId]);
   }
 
   navigateToNotes() {
-    const currentUrl = window.location.pathname;
-    var carId ="";
-    carId = currentUrl.split('/')[2];
+    var carId = localStorage.getItem("carId")
     this.router.navigate(['/notes', carId]);
   }
 }

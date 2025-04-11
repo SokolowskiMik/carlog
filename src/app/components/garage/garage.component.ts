@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
 import {MatListModule} from '@angular/material/list';
@@ -10,6 +10,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { VibrationsService } from '../../data/vibrations.service';
+import { DialogComponent } from '../shared/dialog/dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-garage',
@@ -36,10 +38,12 @@ export class GarageComponent implements OnInit {
     private carService: CarService,
     private router: Router,
     private snackBar: MatSnackBar,
+    private dialog:MatDialog,
     private messagesService: VibrationsService
   ) {}
 
   ngOnInit() {
+    localStorage.removeItem('carId')
     this.loadCars();
     this.messagesService.checkInsuranceExpirations().subscribe(names => {
       this.insuranceExpiring = names;
@@ -63,6 +67,7 @@ export class GarageComponent implements OnInit {
   }
 
   navigateToCarDetails(carId: string) {
+    localStorage.setItem('carId',carId)
     this.router.navigate(['/current-car', carId]);
   }
 
@@ -72,13 +77,26 @@ export class GarageComponent implements OnInit {
 
   deleteCar(carId: string) {
 
-      this.carService.deleteCar(carId)
-        .then(() => {
-          this.snackBar.open('Car deleted successfully', 'Close', { duration: 3000 });
-        })
-        .catch(err => {
-          console.error('Error deleting car:', err);
-          this.snackBar.open('Error deleting car', 'Close', { duration: 3000 });
-        });
+    this.openDialog().then(confirmed => {
+      if (confirmed) {
+        this.carService.deleteCar(carId)
+          .then(() => {
+            this.snackBar.open('Car deleted successfully', 'Close', { duration: 3000 });
+          })
+          .catch(err => {
+            console.error('Error deleting car:', err);
+            this.snackBar.open('Error deleting car', 'Close', { duration: 3000 });
+          });
+      }
+    });
   }
+
+    openDialog(): Promise<boolean> {
+      const dialogRef = this.dialog.open(DialogComponent, {});
+  
+      return dialogRef.afterClosed().toPromise().then(result => {
+        console.log('The dialog was closed', result);
+        return result;
+      });
+    }
 }

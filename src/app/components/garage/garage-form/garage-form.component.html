@@ -77,9 +77,14 @@
       <label for="fileUpload">Upload Car Image</label>
       <input type="file" id="fileUpload" (change)="onFileSelect($event)" accept="image/*">
     </div>
-  
-    <button mat-raised-button color="primary" type="submit" [disabled]="carForm.invalid">
-      Submit
-    </button>
+    <div class="d-flex justify-content-around">
+      <button mat-raised-button color="primary" type="submit" [disabled]="carForm.invalid">
+        Submit
+      </button>
+      <button mat-raised-button color="primary" type="button" (click)="goBack()">
+        Cancel
+      </button>
+    </div>
+ 
   </form>
   

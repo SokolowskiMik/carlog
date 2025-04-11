@@ -63,6 +63,8 @@ import { FuelService } from '../../data/fuel.service';
 import { Fuel } from '../../data/fuel';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { DialogComponent } from '../shared/dialog/dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-fuel',
@@ -87,6 +89,7 @@ export class FuelComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private fuelService: FuelService,
+    private dialog : MatDialog,
     private snackBar: MatSnackBar
   ) {}
 
@@ -117,18 +120,30 @@ export class FuelComponent implements OnInit {
   }
 
   deleteFuel(fuel: Fuel): void {
-    this.fuelService.deleteFuel(this.carId, fuel.id!)
-      .then(() => {
-        this.snackBar.open('Fuel record deleted successfully', 'Close', { duration: 3000 });
-        this.loadFuels();
-      })
-      .catch((error) => {
-        console.error('Error deleting fuel record:', error);
-        this.snackBar.open('Error deleting fuel record', 'Close', { duration: 3000 });
-      });
+    this.openDialog().then(confirmed => {
+      if (confirmed) {
+        this.fuelService.deleteFuel(this.carId, fuel.id!)
+          .then(() => {
+            this.snackBar.open('Fuel record deleted successfully', 'Close', { duration: 3000 });
+            this.loadFuels();
+          })
+          .catch((error) => {
+            console.error('Error deleting fuel record:', error);
+            this.snackBar.open('Error deleting fuel record', 'Close', { duration: 3000 });
+          });
+      }
+    });
   }
 
   addFuel(): void {
     this.router.navigate(['/car', this.carId, 'fuel-form']);
   }
+      openDialog(): Promise<boolean> {
+        const dialogRef = this.dialog.open(DialogComponent, {});
+    
+        return dialogRef.afterClosed().toPromise().then(result => {
+          console.log('The dialog was closed', result);
+          return result;
+        });
+      }
 }

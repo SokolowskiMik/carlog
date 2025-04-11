@@ -1,4 +1,4 @@
-import { Component, OnInit  } from '@angular/core';
+import { Component, inject, OnInit  } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
@@ -9,6 +9,8 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CarService } from '../../data/car.service';
 import { Car } from '../../data/car';
+import { DialogComponent } from '../shared/dialog/dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 @Component({
   selector: 'app-current-car',
   standalone: true,
@@ -44,11 +46,11 @@ import { Car } from '../../data/car';
 export class CurrentCarComponent implements OnInit {
   carId!: string;
   car: any;
-
   constructor(
     private route: ActivatedRoute,
     private carService: CarService,
     private snackBar: MatSnackBar,
+    private dialog : MatDialog,
     private router: Router
   ) {}
 
@@ -73,17 +75,30 @@ export class CurrentCarComponent implements OnInit {
   }
 
   deleteCar() {
+  
+    this.openDialog().then(confirmed => {
+      if (confirmed) {
+        this.carService.deleteCar(this.carId)
+          .then(() => {
+            this.snackBar.open('Car deleted successfully', 'Close', { duration: 3000 });
+            this.router.navigate(['/garage']);
+          })
+          .catch(err => {
+            console.error('Error deleting car:', err);
+            this.snackBar.open('Error deleting car', 'Close', { duration: 3000 });
+          });
+      }
+    });
+    
 
-    this.carService.deleteCar(this.carId)
-      .then(() => {
-        this.snackBar.open('Car deleted successfully', 'Close', { duration: 3000 });
-        this.router.navigate(['/garage']);
-      })
-      .catch(err => {
-        console.error('Error deleting car:', err);
-        this.snackBar.open('Error deleting car', 'Close', { duration: 3000 });
-      });
 }
+  openDialog(): Promise<boolean> {
+    const dialogRef = this.dialog.open(DialogComponent, {});
 
+    return dialogRef.afterClosed().toPromise().then(result => {
+      console.log('The dialog was closed', result);
+      return result;
+    });
+  }
   
 }

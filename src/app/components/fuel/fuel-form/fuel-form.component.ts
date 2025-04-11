@@ -187,4 +187,7 @@ export class FuelFormComponent implements OnInit {
       this.snackBar.open('Error saving fuel record', 'Close', { duration: 3000 });
     } 
   }
+  goBackToFuelDetails(){
+    this.router.navigate(["/car", this.carId, "fuel-details", this.fuelId]);
+  }
 }

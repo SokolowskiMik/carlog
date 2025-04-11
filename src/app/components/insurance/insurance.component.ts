@@ -7,6 +7,7 @@ import { RouterLink, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { InsuranceService } from '../../data/insurance.service';
 import { Insurance } from '../../data/insurance';
+import { DialogComponent } from '../shared/dialog/dialog.component';
 @Component({
   selector: 'app-insurance',
   standalone: true,
@@ -47,10 +48,8 @@ export class InsuranceComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    const currentUrl = window.location.pathname;
-    this.carId = currentUrl.split('/')[2];
+    this.carId = localStorage.getItem("carId")!
     
-    // Load insurance data for this car
     this.loadInsurance();
   }
 
@@ -70,16 +69,27 @@ export class InsuranceComponent implements OnInit {
 
 
   deleteInsurance() {
- 
-      this.insuranceService.deleteInsurance(this.carId)
-        .then(() => {
-          this.snackBar.open('Insurance deleted successfully', 'Close', { duration: 3000 });
-          this.insurance = null;
-        })
-        .catch((error) => {
-          console.error('Error deleting insurance:', error);
-          this.snackBar.open('Error deleting insurance', 'Close', { duration: 3000 });
-        })
-    
+    this.openDialog().then(confirmed => {
+      if (confirmed) {
+        this.insuranceService.deleteInsurance(this.carId)
+          .then(() => {
+            this.snackBar.open('Insurance deleted successfully', 'Close', { duration: 3000 });
+            this.insurance = null;
+          })
+          .catch((error) => {
+            console.error('Error deleting insurance:', error);
+            this.snackBar.open('Error deleting insurance', 'Close', { duration: 3000 });
+          });
+      }
+    });
   }
+
+    openDialog(): Promise<boolean> {
+      const dialogRef = this.dialog.open(DialogComponent, {});
+  
+      return dialogRef.afterClosed().toPromise().then(result => {
+        console.log('The dialog was closed', result);
+        return result;
+      });
+    }
 }

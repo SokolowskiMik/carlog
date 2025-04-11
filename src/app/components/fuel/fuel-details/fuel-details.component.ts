@@ -34,6 +34,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FuelService } from '../../../data/fuel.service';
 import { Fuel } from '../../../data/fuel';
+import { DialogComponent } from '../../shared/dialog/dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-fuel-details',
@@ -58,6 +60,7 @@ export class FuelDetailsComponent implements OnInit {
     private fuelService: FuelService,
     private route: ActivatedRoute,
     private router: Router,
+    private dialog: MatDialog,
     private snackBar: MatSnackBar
   ) {}
 
@@ -89,19 +92,31 @@ export class FuelDetailsComponent implements OnInit {
   }
 
   deleteFuel(): void {
-      this.fuelService.deleteFuel(this.carId, this.fuelId)
-        .then(() => {
-          this.snackBar.open('Fuel record deleted successfully', 'Close', { duration: 3000 });
-          this.router.navigate(['/car', this.carId, 'fuel']);
-        })
-        .catch((error) => {
-          console.error('Error deleting fuel record:', error);
-          this.snackBar.open('Error deleting fuel record', 'Close', { duration: 3000 });
-        });
+    this.openDialog().then(confirmed => {
+      if (confirmed) {
+        this.fuelService.deleteFuel(this.carId, this.fuelId)
+          .then(() => {
+            this.snackBar.open('Fuel record deleted successfully', 'Close', { duration: 3000 });
+            this.router.navigate(['/car', this.carId, 'fuel']);
+          })
+          .catch((error) => {
+            console.error('Error deleting fuel record:', error);
+            this.snackBar.open('Error deleting fuel record', 'Close', { duration: 3000 });
+          });
+      }
+    });
     
   }
 
-  goBackToFuelList(): void {
-    this.router.navigate(['/car', this.carId, 'fuel']);
+  goBackToFuel(): void {
+    this.router.navigate(['/fuel',this.carId]);
+  }
+  openDialog(): Promise<boolean> {
+    const dialogRef = this.dialog.open(DialogComponent, {});
+
+    return dialogRef.afterClosed().toPromise().then(result => {
+      console.log('The dialog was closed', result);
+      return result;
+    });
   }
 }

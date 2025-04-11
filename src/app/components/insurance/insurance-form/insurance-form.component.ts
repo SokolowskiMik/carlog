@@ -122,6 +122,9 @@ export class InsuranceFormComponent implements OnInit {
       this.snackBar.open('Error saving insurance data', 'Close', { duration: 3000 });
     }
   }
+  goToInsurance(){
+    this.router.navigate(['/insurance',this.carId])
+  }
   
 }
 function formatDateOnly(date: Date): string {

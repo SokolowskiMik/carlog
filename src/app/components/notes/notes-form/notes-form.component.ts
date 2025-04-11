@@ -124,7 +124,7 @@ export class NotesFormComponent implements OnInit {
     
     if (currentUrl.includes('notes-form/')) {
       // Get the part after "notes-form/"
-      this.carId = currentUrl.split('notes-form/')[1];
+      this.carId = localStorage.getItem("carId")!;
       console.log('Extracted carId from URL:', this.carId);
     }
   

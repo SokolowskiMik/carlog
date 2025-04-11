@@ -54,6 +54,8 @@ import { NotesService } from '../../data/notes.service';
 import { Note } from '../../data/notes';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { DialogComponent } from '../shared/dialog/dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-notes',
@@ -78,6 +80,7 @@ export class NotesComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private notesService: NotesService,
+    private dialog : MatDialog,
     private snackBar: MatSnackBar
   ) {}
 
@@ -107,19 +110,32 @@ export class NotesComponent implements OnInit {
     this.router.navigate(['/notes-details', this.carId, note.id]);
   }
   deleteNote(note: Note): void {
-      this.notesService.deleteNote(this.carId, note.id!)
-        .then(() => {
-          this.snackBar.open('Note deleted successfully', 'Close', { duration: 3000 });
-          this.loadNotes();
-        })
-        .catch((error) => {
-          console.error('Error deleting note:', error);
-          this.snackBar.open('Error deleting note', 'Close', { duration: 3000 });
-        });
+    this.openDialog().then(confirmed => {
+      if (confirmed) {
+        this.notesService.deleteNote(this.carId, note.id!)
+          .then(() => {
+            this.snackBar.open('Note deleted successfully', 'Close', { duration: 3000 });
+            this.loadNotes();
+          })
+          .catch((error) => {
+            console.error('Error deleting note:', error);
+            this.snackBar.open('Error deleting note', 'Close', { duration: 3000 });
+          });
+      }
+    });
     
   }
 
   addNote(): void {
     this.router.navigate(['notes-form', this.carId]);
+  }
+
+  openDialog(): Promise<boolean> {
+    const dialogRef = this.dialog.open(DialogComponent, {});
+
+    return dialogRef.afterClosed().toPromise().then(result => {
+      console.log('The dialog was closed', result);
+      return result;
+    });
   }
 }
