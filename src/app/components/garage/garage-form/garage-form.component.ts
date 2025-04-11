@@ -62,6 +62,7 @@ export class GarageFormComponent {
               car.technicalInspectionDate = new Date(car.technicalInspectionDate);
             }
             this.carForm.patchValue(car);
+            this.imagePreview = car.image
           } else {
             this.snackBar.open('Car not found!', 'Close', { duration: 3000 });
             this.router.navigate(['/garage']);
@@ -73,11 +74,22 @@ export class GarageFormComponent {
         }
       });
   }
-
+  imagePreview: string | ArrayBuffer | null = null;
   onFileSelect(event: any) {
     if (event.target.files?.length > 0) {
       this.selectedFile = event.target.files[0];
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result;
+      };
+      reader.readAsDataURL(this.selectedFile!);
     }
+  }
+
+  removeImage() {
+    this.selectedFile = null;
+    this.imagePreview = null;
   }
 
   async onSubmit() {

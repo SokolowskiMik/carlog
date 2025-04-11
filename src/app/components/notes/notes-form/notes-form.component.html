@@ -75,8 +75,8 @@
             
             <button type="button" class="btn btn-primary mt-2" (click)="openCamera()">📸 Take Photo</button>
             <!-- Fullscreen camera overlay -->
-            <div class="camera-overlay" *ngIf="isCameraOpen">
-              <video #cameraVideo autoplay playsinline></video>
+            <div *ngIf="isCameraOpen">
+              <video class="container" #cameraVideo autoplay playsinline></video>
               <button type="button" class="btn btn-danger capture-btn" (click)="captureFromCamera()">Capture</button>
               <button type="button" class="btn btn-secondary close-btn" (click)="closeCamera()">Cancel</button>
             </div>
